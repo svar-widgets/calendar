@@ -1,0 +1,43 @@
+export default {
+	eventCalendar: {
+		"Edit event": "イベントを編集",
+		"Delete event": "イベントを削除",
+		Delete: "削除",
+		Text: "テキスト",
+		"Start date": "開始日",
+		"End date": "終了日",
+		"All day": "終日",
+
+		Day: "日",
+		Week: "週",
+		Month: "月",
+		Agenda: "予定",
+		Year: "年",
+		Resources: "リソース",
+		Timeline: "タイムライン",
+
+		Today: "今日",
+		"Full day": "終日",
+		Calendars: "カレンダー",
+		Menu: "メニュー",
+
+		"Previous period": "前の期間",
+		"Next period": "次の期間",
+		"Date navigation": "日付ナビゲーション",
+		"Calendar controls": "カレンダー操作",
+		"Calendar filters": "カレンダーフィルター",
+		Calendar: "カレンダー",
+		"Calendar sidebar": "カレンダーサイドバー",
+
+		timeScaleFormat: "%H:%i",
+		weekScaleFormat: "%j日 %D",
+		monthScaleFormat: "%D",
+		weekNumberFormat: "%w",
+		titleDayFormat: "%Y年%n月%j日 %l",
+		titleWeekFormatStart: "%n月%j日",
+		titleWeekFormatEnd: "%j日 %Y年",
+		titleMonthFormat: "%Y年%n月",
+		yearMonthFormat: "%n月",
+		agendaDayFormat: "%n月%j日 %l",
+	},
+};

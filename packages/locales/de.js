@@ -1,0 +1,43 @@
+export default {
+	eventCalendar: {
+		"Edit event": "Veranstaltung bearbeiten",
+		"Delete event": "Veranstaltung löschen",
+		Delete: "Löschen",
+		Text: "Text",
+		"Start date": "Startdatum",
+		"End date": "Enddatum",
+		"All day": "Ganztägig",
+
+		Day: "Tag",
+		Week: "Woche",
+		Month: "Monat",
+		Agenda: "Agenda",
+		Year: "Jahr",
+		Resources: "Ressourcen",
+		Timeline: "Zeitleiste",
+
+		Today: "Heute",
+		"Full day": "Ganztägig",
+		Calendars: "Kalender",
+		Menu: "Menü",
+
+		"Previous period": "Vorheriger Zeitraum",
+		"Next period": "Nächster Zeitraum",
+		"Date navigation": "Datumsnavigation",
+		"Calendar controls": "Kalendersteuerung",
+		"Calendar filters": "Kalenderfilter",
+		Calendar: "Kalender",
+		"Calendar sidebar": "Kalender-Seitenleiste",
+
+		timeScaleFormat: "%H:%i",
+		weekScaleFormat: "%D, %j.",
+		monthScaleFormat: "%D",
+		weekNumberFormat: "%w",
+		titleDayFormat: "%l, %j. %F %Y",
+		titleWeekFormatStart: "%j. %F",
+		titleWeekFormatEnd: "%j. %F %Y",
+		titleMonthFormat: "%F %Y",
+		yearMonthFormat: "%F",
+		agendaDayFormat: "%l, %j. %F",
+	},
+};

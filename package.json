@@ -1,0 +1,21 @@
+{
+	"name": "@svar-ui/calendar",
+	"version": "2.6.0",
+	"private": true,
+	"license": "MIT",
+	"type": "module",
+	"scripts": {
+		"build": "vp run calendar-ical#build && vp run calendar-locales#build && vp run calendar-provider#build && vp run calendar-store#build && vp run svelte-calendar#build",
+		"ready": "vp fmt && vp lint && vp run test -r && vp run build -r",
+		"start": "vp run svelte-calendar-demos#start",
+		"prepare": "vp config"
+	},
+	"devDependencies": {
+		"vite-plus": "catalog:"
+	},
+	"engines": {
+		"node": ">=22.12.0"
+	},
+	"packageManager": "pnpm@10.32.1",
+	"productTag": "calendar"
+}

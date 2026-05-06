@@ -1,0 +1,41 @@
+export default {
+	eventCalendar: {
+		Delete: "删除",
+		Text: "文本",
+		"Start date": "开始日期",
+		"End date": "结束日期",
+		"All day": "全天",
+
+		Day: "日",
+		Week: "周",
+		Month: "月",
+		Agenda: "日程",
+		Year: "年",
+		Resources: "资源",
+		Timeline: "时间线",
+
+		Today: "今天",
+		"Full day": "全天",
+		Calendars: "日历",
+		Menu: "菜单",
+
+		"Previous period": "上一个时段",
+		"Next period": "下一个时段",
+		"Date navigation": "日期导航",
+		"Calendar controls": "日历控件",
+		"Calendar filters": "日历筛选",
+		Calendar: "日历",
+		"Calendar sidebar": "日历侧边栏",
+
+		timeScaleFormat: "%H:%i",
+		weekScaleFormat: "%D %j日",
+		monthScaleFormat: "%D",
+		weekNumberFormat: "%w",
+		titleDayFormat: "%Y年%n月%j日 %l",
+		titleWeekFormatStart: "%n月%j日",
+		titleWeekFormatEnd: "%j日, %Y",
+		titleMonthFormat: "%Y年%n月",
+		yearMonthFormat: "%n月",
+		agendaDayFormat: "%n月%j日 %l",
+	},
+};
