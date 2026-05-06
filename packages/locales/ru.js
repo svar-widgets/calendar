@@ -1,0 +1,43 @@
+export default {
+	eventCalendar: {
+		"Edit event": "Редактировать событие",
+		"Delete event": "Удалить событие",
+		Delete: "Удалить",
+		Text: "Текст",
+		"Start date": "Дата начала",
+		"End date": "Дата окончания",
+		"All day": "Весь день",
+
+		Day: "День",
+		Week: "Неделя",
+		Month: "Месяц",
+		Agenda: "Расписание",
+		Year: "Год",
+		Resources: "Ресурсы",
+		Timeline: "Лента времени",
+
+		Today: "Сегодня",
+		"Full day": "Весь день",
+		Calendars: "Календари",
+		Menu: "Меню",
+
+		"Previous period": "Предыдущий период",
+		"Next period": "Следующий период",
+		"Date navigation": "Навигация по датам",
+		"Calendar controls": "Управление календарем",
+		"Calendar filters": "Фильтры календаря",
+		Calendar: "Календарь",
+		"Calendar sidebar": "Боковая панель календаря",
+
+		timeScaleFormat: "%H:%i",
+		weekScaleFormat: "%D, %j",
+		monthScaleFormat: "%D",
+		weekNumberFormat: "%w",
+		titleDayFormat: "%j %F %Y, %l",
+		titleWeekFormatStart: "%j %F",
+		titleWeekFormatEnd: "%j %F %Y",
+		titleMonthFormat: "%F %Y",
+		yearMonthFormat: "%F",
+		agendaDayFormat: "%j %F, %l",
+	},
+};

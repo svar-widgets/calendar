@@ -1,0 +1,40 @@
+{
+	"name": "@svar-ui/calendar-store",
+	"version": "2.6.0",
+	"description": "State and models for SVAR Calendar",
+	"homepage": "https://svar.dev",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/svar-widgets/calendar.git"
+	},
+	"files": [
+		"dist",
+		"license.txt"
+	],
+	"type": "module",
+	"exports": {
+		".": "./dist/index.mjs",
+		"./package.json": "./package.json"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build": "vp pack",
+		"watch": "vp pack --watch",
+		"test": "vp test",
+		"check": "vp check",
+		"prepublishOnly": "vp run build"
+	},
+	"dependencies": {
+		"@svar-ui/lib-dom": "catalog:",
+		"@svar-ui/lib-state": "catalog:"
+	},
+	"devDependencies": {
+		"@svar-ui/lib-state": "catalog:",
+		"@typescript/native-preview": "catalog:",
+		"typescript": "catalog:",
+		"vite-plus": "catalog:"
+	}
+}
