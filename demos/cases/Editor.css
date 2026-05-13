@@ -1,0 +1,21 @@
+div.wx-panel.wx-editor-calendar.editor-custom {
+  padding: 20px 20px 16px 20px;
+}
+.wx-editor-calendar.editor-custom .wx-sections > div:last-child .wx-field {
+  margin-bottom: 4px;
+}
+.wx-editor-calendar.editor-custom .wx-content .wx-right {
+  margin-left: 0px;
+  min-height: auto;
+}
+.wx-editor-calendar.editor-custom .wx-comments-list {
+  min-height: 250px;
+  max-height: 370px;
+}
+.wx-editor-calendar.editor-custom .wx-tasks-list {
+  max-height: 300px;
+}
+.wx-editor-calendar.editor-custom div.wx-editor-toolbar,
+.wx-editor-calendar.editor-custom div.wx-editor-toolbar .wx-toolbar {
+  padding: 0;
+}

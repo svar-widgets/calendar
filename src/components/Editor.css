@@ -1,0 +1,6 @@
+.wx-sidearea .wx-editor-calendar {
+  width: 450px;
+}
+.wx-editor-calendar.wx-editor-all-day .wx-timepicker {
+  visibility: hidden;
+}

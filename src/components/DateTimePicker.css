@@ -1,0 +1,15 @@
+.wx-event-calendar-date_field.wx-aadDke8a {
+  display: flex;
+}
+.wx-event-calendar-date_field.wx-aadDke8a .wx-event-calendar-input_wrapper {
+  flex-grow: 2;
+}
+.wx-event-calendar-date_field.wx-aadDke8a .timepicker {
+  width: unset !important;
+}
+.wx-event-calendar-input_wrapper.wx-aadDke8a {
+  margin-right: 10px;
+}
+.wx-event-calendar-editor-controls > .btn:not(:last-child) {
+  margin-right: 5px;
+}

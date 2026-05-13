@@ -1,0 +1,39 @@
+.wx-bar-section.wx-aacgzzUM {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.wx-bar-event.wx-aacgzzUM {
+  position: absolute;
+  background-color: var(--wx-color-primary);
+  color: var(--wx-color-primary-font);
+  border-radius: var(--wx-border-radius);
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.wx-bar-event.wx-aacgzzUM:hover {
+  opacity: 0.9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+.wx-bar-single-day.wx-aacgzzUM {
+  background-color: transparent;
+  color: var(--wx-color-font);
+  box-shadow: none;
+  border-radius: 0;
+}
+.wx-bar-single-day.wx-aacgzzUM:hover {
+  background-color: var(--wx-color-secondary-hover);
+  box-shadow: none;
+  opacity: 1;
+}
+.wx-bar-title.wx-aacgzzUM {
+  padding: 0 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--wx-font-size-sm);
+  line-height: 1.2;
+}

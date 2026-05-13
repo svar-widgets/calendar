@@ -1,0 +1,12 @@
+.wx-date-nav.wx-aadwaVAO {
+  display: flex;
+  align-items: center;
+}
+.wx-date-nav.wx-aadwaVAO button:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.wx-date-nav.wx-aadwaVAO button:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}

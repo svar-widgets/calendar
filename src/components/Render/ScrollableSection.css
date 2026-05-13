@@ -1,0 +1,48 @@
+.wx-scrollable-section.wx-aacAsb1k {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.wx-scroll-grid.wx-aacAsb1k {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  min-height: 100%;
+}
+.wx-scroll-grid.wx-has-y-headers.wx-aacAsb1k {
+  grid-template-columns: auto 1fr;
+}
+.wx-scroll-grid.wx-has-x-headers.wx-aacAsb1k {
+  grid-template-rows: auto 1fr;
+}
+
+.wx-corner.wx-aacAsb1k {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  background: var(--wx-background);
+  width: var(--wx-calendar-y-scale-width, 60px);
+  border-right: var(--wx-border);
+  border-bottom: var(--wx-border);
+}
+
+.wx-x-headers-sticky.wx-aacAsb1k {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--wx-background);
+}
+
+.wx-y-headers-sticky.wx-aacAsb1k {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--wx-background);
+}
+
+.wx-content.wx-aacAsb1k {
+  position: relative;
+  z-index: 0;
+}

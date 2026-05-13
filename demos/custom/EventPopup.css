@@ -1,0 +1,66 @@
+.event-card.wx-aace0zHy {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+  width: 280px;
+  font-size: 13px;
+}
+.card-header.wx-aace0zHy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+.card-title.wx-aace0zHy {
+  font-weight: 600;
+  font-size: 15px;
+  color: #1e293b;
+}
+.card-body.wx-aace0zHy {
+  padding: 12px 16px;
+}
+.card-row.wx-aace0zHy {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+.card-label.wx-aace0zHy {
+  color: #64748b;
+  font-size: 12px;
+}
+.card-value.wx-aace0zHy {
+  color: #1e293b;
+  font-size: 12px;
+}
+.card-actions.wx-aace0zHy {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid #e2e8f0;
+}
+.btn.wx-aace0zHy {
+  flex: 1;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+}
+.btn-primary.wx-aace0zHy {
+  background: #3b82f6;
+  color: white;
+}
+.btn-primary.wx-aace0zHy:hover {
+  background: #2563eb;
+}
+.btn-secondary.wx-aace0zHy {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+.btn-secondary.wx-aace0zHy:hover {
+  background: #e2e8f0;
+}

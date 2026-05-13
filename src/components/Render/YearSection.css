@@ -1,0 +1,101 @@
+.wx-year-grid.wx-aaalPWdG {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  position: relative;
+}
+.wx-month-label.wx-aaalPWdG {
+  font-weight: var(--wx-font-weight-md);
+  margin-bottom: 4px;
+  padding-left: 20px;
+}
+.wx-month-grid.wx-aaalPWdG {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+}
+.wx-weekday-header.wx-aaalPWdG {
+  text-align: center;
+  font-size: 10px;
+  color: var(--wx-color-font-alt);
+  padding: 2px 0;
+}
+.wx-month-day.wx-aaalPWdG {
+  text-align: center;
+  padding: 2px;
+  position: relative;
+  min-height: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: default;
+  color: var(--wx-color-font-alt);
+}
+.wx-month-day.wx-weekend.wx-aaalPWdG,
+.wx-weekday-header.wx-weekend.wx-aaalPWdG {
+  background-color: var(--wx-calendar-weekend-background);
+}
+.wx-month-day.wx-has-events.wx-aaalPWdG {
+  cursor: pointer;
+  color: var(--wx-color-font);
+}
+.wx-day-num.wx-aaalPWdG {
+  font-size: 13px;
+}
+.wx-month-day.wx-today.wx-aaalPWdG .wx-day-num {
+  background: var(--wx-color-primary);
+  color: var(--wx-color-primary-font);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  display: inline-block;
+}
+.wx-event-dot.wx-aaalPWdG {
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--wx-color-primary);
+  margin-top: 1px;
+}
+.wx-year-tooltip.wx-aaalPWdG {
+  background: var(--wx-background);
+  border: var(--wx-border);
+  border-radius: var(--wx-border-radius);
+  padding: 8px 12px;
+  box-shadow: var(--wx-shadow-light);
+  min-width: 150px;
+  max-width: 300px;
+}
+.wx-year-tooltip-custom.wx-aaalPWdG {
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  min-width: 0;
+  max-width: none;
+}
+.wx-tooltip-event.wx-aaalPWdG {
+  display: flex;
+  align-items: center;
+  padding: 2px 0;
+  font-size: var(--wx-font-size-sm);
+}
+.wx-tooltip-event.wx-aaalPWdG + .wx-tooltip-event {
+  border-top: var(--wx-border);
+  padding-top: 4px;
+  margin-top: 2px;
+}
+.wx-tooltip-time.wx-aaalPWdG {
+  flex-shrink: 0;
+  color: var(--wx-color-font-alt);
+  margin-right: 8px;
+}
+.wx-tooltip-title.wx-aaalPWdG {
+  color: var(--wx-color-font);
+}
+.wx-tooltip-event-content.wx-aaalPWdG {
+  flex: 1;
+  min-width: 0;
+}

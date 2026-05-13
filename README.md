@@ -1,107 +1,101 @@
 <div align="center">
-	
-# SVAR Svelte Calendar
+
+# SVAR React Calendar
+
+[Website](https://svar.dev/react/calendar/) • [Docs](https://docs.svar.dev/react/calendar/getting-started/quick-start/) • [Demos](https://docs.svar.dev/react/calendar/samples/)
+
+[![npm](https://img.shields.io/npm/v/@svar-ui/react-calendar.svg)](https://www.npmjs.com/package/@svar-ui/react-calendar)
+[![License](https://img.shields.io/github/license/svar-widgets/react-calendar)](https://github.com/svar-widgets/react-calendar/blob/main/license.txt)
+[![npm downloads](https://img.shields.io/npm/dm/@svar-ui/react-calendar.svg)](https://www.npmjs.com/package/@svar-ui/react-calendar)
 
 </div>
 
-<div align="center">
+[SVAR React Calendar](https://svar.dev/react/calendar/) is a customizable, high-performance React calendar component for event planning and scheduling. It includes multiple built-in calendar views, event edit form, filtering, theming, drag-and-drop interactions, and a flexible API for toolbars and menus.
 
-[Homepage](https://svar.dev/svelte/calendar/) • [Getting Started](https://docs.svar.dev/svelte/calendar/getting-started/quick-start/) • [Demos](https://docs.svar.dev/svelte/calendar/samples/)
-
-</div>
+The component helps you quickly build modern scheduling interfaces for React applications with minimal setup. Includes TypeScript support and is compatible with React 18+ and Next.js.
 
 <div align="center">
-
-[![npm](https://img.shields.io/npm/v/@svar-ui/svelte-calendar.svg)](https://www.npmjs.com/package/@svar-ui/svelte-calendar)
-[![License](https://img.shields.io/github/license/svar-widgets/calendar)](https://github.com/svar-widgets/calendar/blob/main/license.txt)
-[![npm downloads](https://img.shields.io/npm/dm/@svar-ui/svelte-calendar.svg)](https://www.npmjs.com/package/@svar-ui/svelte-calendar)
-
-</div>
-
-[SVAR Svelte Calendar](https://svar.dev/svelte/calendar/) is an interactive event calendar and scheduler component for Svelte and SvelteKit apps. It supports Day, Week, and Month views, drag-and-drop event editing, a ready-to-use event edit form, and rich customization options. 
-
-The calendar comes with full TypeScript support, extensible API, and flexible CSS styling. The PRO Edition offers additional views (Year, Agenda, Timeline, Resources) and recurring event support. 
-
-<div align="center">
-<img src="https://svar.dev/images/github/github-calendar.gif" alt="SVAR Svelte Calendar Preview">
+<img src="https://svar.dev/images/github/github-calendar.gif" alt="SVAR React Calendar Preview">
 </div>
 
 ### ✨ Key Features
 
-- Multiple built-in views: Day, Week, Month
-- Drag-and-drop to move, resize, and create events
-- Customizable event editor form
-- Context menu and toolbar
-- Tooltips and custom event cards
-- Custom HTML in event markup
-- Multiple calendars with toggleable visibility
-- Event filtering
-- iCal import/export
-- Localization
-- Light and dark themes
-- Full TypeScript support
-- REST data provider for backend integration
+- Day, week, and month views
+- Drag-and-drop event move and resize
+- Drag-to-create events in time-grid views
+- Sidebar or popup event editor
+- Calendar groups sidebar with built-in filtering
+- Context menu support for quick actions
+- Custom toolbar layouts and helper APIs
+- Custom event content, event cards, and tooltips
+- Event filtering with tagged predicates
+- Localization and configurable week start
+- Built-in light and dark themes
+- iCal import/export support
+- Custom view registration for advanced layouts
+- TypeScript definitions included
+- React 18+ compatible
 
 ### 🚀 PRO Edition
 
-SVAR Svelte Calendar is available in open-source and [PRO Editions](https://svar.dev/svelte/calendar/#pro). The PRO Edition offers four more scheduling views and automation features:
+SVAR React Calendar is available in open-source and PRO editions. The PRO build adds advanced scheduling views and recurrence support without changing the component API.
 
-- Year view
+PRO features include:
+
 - Agenda view
-- Timeline view (horizontal timeline with resource rows)
-- Resources view (single day with resource columns)
-- Recurring events (RRULE-based)
+- Year view
+- Resources view
+- Timeline view
+- Recurring events with RRULE expansion
 
-Visit the [pricing page](https://svar.dev/svelte/calendar/pricing/) for full feature comparison, licensing details, and **free trial**.
+Visit the [pricing page](https://svar.dev/react/calendar/pricing/) for licensing details, feature comparison, and free trial.
 
-Or [see the live demo](https://svar.dev/demos/calendar/).
+[Check out the live demo](https://svar.dev/demos/react/calendar/) to see SVAR React Calendar in action.
 
-### 🛠️ How to Use
+### :hammer_and_wrench: How to Use
 
-To use the calendar widget, simply import the package and include the component in your Svelte file:
+Import the package, pass an `events` array and a `date`, and optionally attach the editor through the calendar API:
 
-```svelte
-<script>
-	import { Calendar } from "@svar-ui/svelte-calendar";
+```jsx
+import { useState } from 'react';
+import { Calendar, Editor } from '@svar-ui/react-calendar';
+import '@svar-ui/react-calendar/all.css';
 
-	const events = [
-		{
-			id: 1,
-			start: new Date(2026, 4, 5, 10, 0),
-			end: new Date(2026, 4, 5, 11, 30),
-			text: "Project kickoff",
-			details: "Outline the project's scope and resources.",
-		},
-	];
-	const date = new Date(2026, 4, 5);
-</script>
+const events = [
+  {
+    id: 1,
+    text: 'Team standup',
+    start: new Date(2026, 3, 20, 9, 0),
+    end: new Date(2026, 3, 20, 9, 30),
+  },
+  {
+    id: 2,
+    text: 'Sprint planning',
+    start: new Date(2026, 3, 20, 10, 0),
+    end: new Date(2026, 3, 20, 11, 30),
+  },
+];
 
-<Calendar {events} {date} view="week" />
+export default function App() {
+  const [api, setApi] = useState(null);
+
+  return (
+    <>
+      <Calendar init={setApi} events={events} date={new Date(2026, 3, 20)} />
+      {api && <Editor api={api} />}
+    </>
+  );
+}
 ```
 
-For further instructions, follow the detailed [quick start guide](https://docs.svar.dev/svelte/calendar/getting-started/quick-start/).
+By default, the calendar exposes `day`, `week`, and `month` views. Add extra view ids through the `views` prop to enable `agenda`, `year`, `resources`, or `timeline`.
 
-### How to Modify
-
-Typically, you don't need to modify the code. However, if you wish to do so, follow these steps:
-
-1. Install [vite-plus](https://vite.plus) (`curl -fsSL https://vite.plus | bash` on Mac/Linux, `irm https://vite.plus/ps1 | iex` on Windows). The project uses `pnpm` workspaces under the hood, so plain `npm` will not work.
-2. Run `vp i` from the project root to install dependencies.
-3. Run `vp run build` to build all packages.
-4. Start the demo app in development mode with `vp run start`.
-
-### Run Tests
-
-To run the tests:
-
-```sh
-vp test
-```
-
-### ⭐ Show Your Support
-
-If SVAR Svelte Calendar helps your project, [give us a star](https://github.com/svar-widgets/calendar/)! It helps us reach more developers and keeps us motivated to add new features.
+For further instructions, follow the detailed [quick start guide](https://docs.svar.dev/react/calendar/getting-started/quick-start/).
 
 ### :speech_balloon: Need Help?
 
-[Post an Issue](https://github.com/svar-widgets/calendar/issues/) or use our [community forum](https://forum.svar.dev).
+[Post an issue](https://github.com/svar-widgets/react-calendar/issues) or use our [community forum](https://forum.svar.dev).
+
+### ⭐ Show Your Support
+
+If SVAR React Calendar helps your project, [give it a star](https://github.com/svar-widgets/react-calendar). It helps other developers discover this library and motivates us to keep improving.

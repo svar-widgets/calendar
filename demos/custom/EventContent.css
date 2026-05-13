@@ -1,0 +1,60 @@
+.custom-box.wx-aabjVKtz {
+  padding: 2px 4px;
+}
+.custom-box-header.wx-aabjVKtz {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  font-size: 12px;
+}
+.custom-time.wx-aabjVKtz {
+  font-size: 10px;
+  opacity: 0.85;
+}
+.custom-badge.wx-aabjVKtz {
+  display: inline-block;
+  margin-top: 2px;
+  padding: 0 4px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.custom-badge-high.wx-aabjVKtz {
+  background: #c62828;
+  color: #fff;
+}
+.custom-badge-medium.wx-aabjVKtz {
+  background: #ef6c00;
+  color: #fff;
+}
+.custom-badge-low.wx-aabjVKtz {
+  background: #2e7d32;
+  color: #fff;
+}
+.custom-bar.wx-aabjVKtz {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  line-height: 1;
+}
+.custom-bar-title.wx-aabjVKtz {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.custom-icon.wx-aabjVKtz {
+  color: #fff;
+  font-weight: 700;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 3px;
+  padding: 0 3px;
+  font-size: 10px;
+  line-height: 16px;
+}

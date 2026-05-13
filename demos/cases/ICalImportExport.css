@@ -1,0 +1,6 @@
+.wx-toolbar-2 {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  border-bottom: 1px solid #ccc;
+}

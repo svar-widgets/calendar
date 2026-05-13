@@ -1,0 +1,25 @@
+.wx-calendar.wx-aaccgHBn {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.wx-layout-content.wx-aaccgHBn {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+.wx-layout-sidebar.wx-aaccgHBn {
+  flex-shrink: 0;
+  border-right: var(--wx-border);
+}
+.wx-layout-main.wx-aaccgHBn {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.wx-layout-main--full.wx-aaccgHBn {
+  min-height: 0;
+}

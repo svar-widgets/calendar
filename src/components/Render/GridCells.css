@@ -1,0 +1,15 @@
+.wx-grid.wx-aabePxNp {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.wx-grid-cell.wx-aabePxNp {
+  position: absolute;
+  box-sizing: border-box;
+  border-right: var(--wx-border);
+  border-bottom: var(--wx-border);
+}
+.wx-grid-cell.wx-weekend.wx-aabePxNp {
+  background-color: var(--wx-calendar-weekend-background);
+}

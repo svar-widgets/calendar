@@ -1,0 +1,10 @@
+.wx-date-time-field.wx-aadfEdWd {
+  display: flex;
+  gap: 8px;
+}
+.wx-date-time-field.wx-aadfEdWd .date.wx-aadfEdWd {
+  flex: 1 1 auto;
+}
+.wx-date-time-field .timepicker {
+  width: unset !important;
+}

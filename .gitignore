@@ -8,8 +8,9 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-.svelte-kit
 dist
+dist-demos
+dist-full
 dist-ssr
 *.local
 
@@ -23,10 +24,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-test-results
-
-stats.html
-tl.db*
-
-# Local MCP server config
-.mcp.json
+yarn.log
+.claude

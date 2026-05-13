@@ -1,0 +1,40 @@
+.wx-list-section.wx-aabV8sAP {
+  padding: 8px 0;
+}
+.wx-list-day.wx-aabV8sAP {
+  margin-bottom: 4px;
+}
+.wx-list-date.wx-aabV8sAP {
+  padding: 8px 16px;
+  font-weight: var(--wx-font-weight-md);
+  border-bottom: var(--wx-border);
+  background: var(--wx-background-alt);
+}
+.wx-list-event.wx-aabV8sAP {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px 8px 32px;
+  border-bottom: var(--wx-border);
+  cursor: pointer;
+}
+.wx-list-event.wx-aabV8sAP:hover {
+  background-color: var(--wx-background-hover);
+}
+.wx-event-time.wx-aabV8sAP {
+  flex-shrink: 0;
+  width: 130px;
+  font-size: 13px;
+  color: var(--wx-color-font-alt);
+}
+.wx-event-title.wx-aabV8sAP {
+  font-size: var(--wx-font-size);
+}
+.wx-list-event-content.wx-aabV8sAP {
+  flex: 1;
+  min-width: 0;
+}
+.wx-list-empty.wx-aabV8sAP {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--wx-color-font-alt);
+}

@@ -1,0 +1,31 @@
+.holiday {
+  background-color: #fde8e8 !important;
+}
+.weekend {
+  background-color: #f5f0ff !important;
+}
+.lunch {
+  background-color: #fef9e7 !important;
+}
+.priority-high {
+  background-color: #c62828 !important;
+  border-left-color: #b71c1c !important;
+}
+.priority-medium {
+  background-color: #ef6c00 !important;
+  border-left-color: #e65100 !important;
+}
+.priority-low {
+  background-color: #2e7d32 !important;
+  border-left-color: #1b5e20 !important;
+}
+.priority-high.bar-event.wx-bar-single-day,
+.priority-medium.bar-event.wx-bar-single-day,
+.priority-low.bar-event.wx-bar-single-day {
+  background-color: transparent !important;
+}
+.priority-high.grid-event.wx-bar-single-day,
+.priority-medium.grid-event.wx-bar-single-day,
+.priority-low.grid-event.wx-bar-single-day {
+  background-color: transparent !important;
+}

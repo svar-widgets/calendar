@@ -1,0 +1,20 @@
+.wx-grid.wx-aaeh5mqL {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.wx-grid-line.wx-aaeh5mqL {
+  position: absolute;
+  background-color: var(--wx-calendar-grid-color);
+}
+.wx-grid-line.wx-aaeh5mqL.wx-vertical {
+  top: 0;
+  width: 1px;
+  height: 100%;
+}
+.wx-grid-line.wx-aaeh5mqL.wx-horizontal {
+  left: 0;
+  height: 1px;
+  width: 100%;
+}

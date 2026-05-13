@@ -1,0 +1,28 @@
+.wx-now-line.wx-aaeJfseq {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+.wx-now-line::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: var(--wx-color-danger);
+  transform: translateY(-50%);
+}
+.wx-now-dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--wx-color-danger);
+  transform: translate(-50%, -50%);
+}

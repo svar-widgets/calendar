@@ -1,0 +1,35 @@
+.layout.wx-aaeuHGVI {
+  height: 100%;
+}
+
+.cal-work.wx-calendar-name,
+.cal-work.wx-calendar-name label {
+  background-color: #9797f8;
+  color: white;
+}
+.cal-work.wx-box-event,
+.cal-work.wx-bar-event {
+  background-color: #9797f8;
+}
+
+.cal-home.wx-calendar-name,
+.cal-home.wx-calendar-name label {
+  background-color: #a0e4c3;
+  color: #444;
+}
+.cal-home.wx-box-event,
+.cal-home.wx-bar-event {
+  background-color: #a0e4c3;
+  color: #444;
+}
+
+.cal-holiday.wx-calendar-name,
+.cal-holiday.wx-calendar-name label {
+  background-color: #f1e1b4;
+  color: #444;
+}
+.cal-holiday.wx-box-event,
+.cal-holiday.wx-bar-event {
+  background-color: #f1e1b4;
+  color: #444;
+}
