@@ -6,10 +6,10 @@
 	const fullPath = $derived(data[0].replace(":skin", skin));
 </script>
 
+{#key fullPath}
 <a
 	use:link={fullPath}
-	use:active
-	href="/"
+	use:active={fullPath}
 	class="demo"
 >
 	{data[1]}
@@ -17,6 +17,7 @@
 		<span class="pro">PRO</span>
 	{/if}
 </a>
+{/key}
 
 <style>
 	.demo {
@@ -26,7 +27,7 @@
 		font-weight: 400;
 		padding: 0 16px 0 12px;
 		border-left: 4px solid transparent;
-		color: #595b66;
+		color: var(--demo-chrome-link-fg);
 		list-style: none;
 		cursor: pointer;
 		text-decoration: none;
@@ -39,8 +40,8 @@
 	:global(.demo.active),
 	.demo:hover {
 		font-weight: 500;
-		color: #42454d;
-		background-color: #f1f1f1;
+		color: var(--demo-chrome-link-active-fg);
+		background-color: var(--demo-chrome-link-active-bg);
 	}
 	.pro {
 		color: var(--demo-framework-color);

@@ -50,7 +50,7 @@
 	}
 
 	$effect(() => {
-		document.body.className = `wx-willow-theme`;
+		document.body.className = `wx-${skin}-theme`;
 	});
 </script>
 
@@ -60,7 +60,7 @@
 	<obj.component />
 {/each}
 
-<div class="layout" class:active={show} class:narrow={isMobileView}>
+<div class="layout" class:narrow={isMobileView}>
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<!-- svelte-ignore a11y_interactive_supports_focus -->
@@ -200,15 +200,47 @@
 		font-family: Roboto, Arial, Helvetica, sans-serif;
 	}
 
-	.page-header {
-		--wx-border: 1px solid #ebebeb;
+	:global(.wx-willow-theme) {
+		--demo-chrome-bg: #fbfbfb;
+		--demo-chrome-border: #ebebeb;
+		--demo-chrome-fg: #42454d;
+		--demo-chrome-fg-strong: #2c2f3c;
+		--demo-chrome-btn-hover-bg: #f7f7f7;
+		--demo-chrome-btn-active-bg: #f1f1f1;
+		--demo-chrome-segmented-selected-bg: #ffffff;
+		--demo-chrome-link-fg: #595b66;
+		--demo-chrome-link-active-fg: #42454d;
+		--demo-chrome-link-active-bg: #f1f1f1;
+		--demo-chrome-icon-filter: none;
 	}
+
+	:global(.wx-willow-dark-theme) {
+		--demo-chrome-bg: #222224;
+		--demo-chrome-border: #384047;
+		--demo-chrome-fg: rgba(255, 255, 255, 0.9);
+		--demo-chrome-fg-strong: #ffffff;
+		--demo-chrome-btn-hover-bg: rgba(255, 255, 255, 0.04);
+		--demo-chrome-btn-active-bg: rgba(255, 255, 255, 0.08);
+		--demo-chrome-segmented-bg: #30373d;
+		--demo-chrome-segmented-selected-bg: #48535c;
+		--demo-chrome-link-fg: rgba(255, 255, 255, 0.9);
+		--demo-chrome-link-active-fg: #ffffff;
+		--demo-chrome-link-active-bg: #384047;
+		--demo-chrome-icon-filter: brightness(0) invert(1);
+	}
+
 	.layout {
 		--demo-framework-color: #fc6519;
+		--wx-border: 1px solid var(--demo-chrome-border);
+		--demo-chrome-segmented-selected-shadow: 0 0 7px 0 rgba(66, 69, 76, 0.07);
 		box-sizing: border-box;
 		display: flex;
 		height: 100%;
 		width: 100%;
+	}
+
+	.page-header {
+		background-color: var(--demo-chrome-bg);
 	}
 
 	.page-content {
@@ -275,10 +307,6 @@
 		gap: 12px;
 	}
 
-	.layout.active {
-		flex-direction: row;
-	}
-
 	.sidebar {
 		width: 0;
 		height: 100%;
@@ -297,7 +325,7 @@
 		position: sticky;
 		top: 0px;
 		padding: 14px 16px 14px 18px;
-		background-color: #fbfbfb;
+		background-color: var(--demo-chrome-bg);
 	}
 
 	.box-title {
@@ -320,7 +348,7 @@
 	.separator {
 		width: 1px;
 		height: 20px;
-		background: #ebebeb;
+		background: var(--demo-chrome-border);
 	}
 
 	.sidebar.active,
@@ -342,7 +370,7 @@
 		overflow-y: auto;
 		font-size: 16px;
 		line-height: 20px;
-		background-color: #fbfbfb;
+		background-color: var(--demo-chrome-bg);
 		border-bottom: var(--wx-border);
 	}
 
@@ -351,23 +379,23 @@
 		align-items: center;
 		gap: 8px;
 		border: var(--wx-border);
-		color: #2c2f3c;
+		color: var(--demo-chrome-fg-strong);
 		font-weight: 500;
 		line-height: 18px;
 
 		&:hover,
 		&:focus {
 			border: var(--wx-border);
-			background: #f7f7f7;
+			background: var(--demo-chrome-btn-hover-bg);
 		}
 
 		&:active {
-			background: #f1f1f1;
+			background: var(--demo-chrome-btn-active-bg);
 		}
 
 		:global(i) {
 			opacity: 1;
-			color: #42454d;
+			color: var(--demo-chrome-fg);
 		}
 	}
 
@@ -397,6 +425,7 @@
 		height: 100%;
 		width: 100%;
 		object-fit: cover;
+		filter: var(--demo-chrome-icon-filter);
 	}
 
 	a {
@@ -413,9 +442,6 @@
 		height: calc(100% - 116px);
 	}
 
-	.content :global(.wx-sidearea) {
-		height: 100% !important;
-	}
 	.content {
 		position: relative;
 		width: 100%;
@@ -486,8 +512,8 @@
 		font-weight: 600;
 		letter-spacing: 0.6px;
 		text-transform: uppercase;
-		color: #9fa1ae;
-		padding: 22px 16px 6px 16px;
+		color: var(--wx-color-font-alt);
+		padding: 20px 16px 2px 16px;
 	}
 
 	.box-links > .group-title:first-child {
@@ -499,7 +525,7 @@
 		font-size: 16px;
 		font-weight: 500;
 		line-height: 24px;
-		color: #42454d;
+		color: var(--demo-chrome-fg);
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -510,7 +536,7 @@
 		font-size: 18px;
 		font-weight: 500;
 		line-height: 24px;
-		color: #42454d;
+		color: var(--demo-chrome-fg);
 		white-space: nowrap;
 	}
 
@@ -535,8 +561,8 @@
 			border-radius: 2px;
 			font-weight: 500;
 			color: var(--wx-color-font);
-			background: #fff;
-			box-shadow: 0px 0px 7px 0px rgba(66, 69, 76, 0.07);
+			background: var(--demo-chrome-segmented-selected-bg);
+			box-shadow: var(--demo-chrome-segmented-selected-shadow);
 		}
 
 		:global(div.segmented-themes button svg) {
@@ -556,5 +582,11 @@
 			height: 24px;
 			width: 24px;
 		}
+	}
+
+	/* Dark skin fills the segmented track per figma; light leaves the bg
+	   to Willow's default so the original look is preserved. */
+	:global(.wx-willow-dark-theme) .segmented-box :global(div.segmented-themes) {
+		background-color: var(--demo-chrome-segmented-bg);
 	}
 </style>

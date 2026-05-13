@@ -13,14 +13,14 @@ catalog:
   "@svar-ui/lib-data-provider": "1.7.2"
   "@svar-ui/lib-dom": "0.12.1"
   "@svar-ui/lib-state": "1.9.6"
-  "@svar-ui/svelte-comments": "2.5.0"
-  "@svar-ui/svelte-core": "2.5.0"
-  "@svar-ui/svelte-editor": "2.5.0"
+  "@svar-ui/svelte-comments": "2.5.3"
+  "@svar-ui/svelte-core": "2.5.3"
+  "@svar-ui/svelte-editor": "2.5.3"
   "@svar-ui/svelte-filter": "2.5.0"
   "@svar-ui/svelte-layout": "2.5.0"
-  "@svar-ui/svelte-menu": "2.5.0"
-  "@svar-ui/svelte-tasklist": "2.5.0"
-  "@svar-ui/svelte-toolbar": "2.5.0"
+  "@svar-ui/svelte-menu": "2.5.3"
+  "@svar-ui/svelte-tasklist": "2.5.3"
+  "@svar-ui/svelte-toolbar": "2.5.3"
   playwright: 1.58.2
   rollup-plugin-visualizer: ^7.0.1
   sharp: ^0.34.5

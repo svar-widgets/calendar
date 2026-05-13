@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { getContext } from "svelte";
-	import { Calendar } from "@svar-ui/svelte-calendar";
+	import { Calendar, Editor, registerEditorItem } from "@svar-ui/svelte-calendar";
 	import type { CalendarInstanceApi } from "@svar-ui/svelte-calendar";
-	import { Editor, registerEditorItem } from "@svar-ui/svelte-editor";
 	import { Comments } from "@svar-ui/svelte-comments";
 	import { Tasklist } from "@svar-ui/svelte-tasklist";
 	import { relDate } from "../data.js";
@@ -118,10 +117,8 @@
 	];
 
 	let api = $state<CalendarInstanceApi>();
-	const editorData = $derived.by(() =>
-		api ? api.getReactiveState().editorData : null
-	);
-	const selected = $derived(editorData ? $editorData : null);
+	const editorDataStore = $derived(api?.getReactiveState().editorData);
+	const selected = $derived(editorDataStore ? $editorDataStore : null);
 
 	$effect(() => {
 		if (selected) currentStart = selected.start ?? null;
@@ -152,53 +149,15 @@
 		],
 	};
 
-	function sameDay(a: Date, b: Date): boolean {
-		return (
-			a.getFullYear() === b.getFullYear() &&
-			a.getMonth() === b.getMonth() &&
-			a.getDate() === b.getDate()
-		);
-	}
-
-	function handleChange({
-		key,
-		value,
-		update,
-	}: {
-		key: string;
-		value: any;
-		update: Record<string, any>;
-	}) {
+	function handleChange({ key, value }: { key: string; value: any }) {
+		// Wrapper handles the same-day end-date shift; we only mirror
+		// `start` into local state so the `end` validation closure can
+		// compare against the latest value.
 		if (key === "start") currentStart = value;
-
-		if (!selected) return;
-		if (key === "start") {
-			const oldStart = selected.start;
-			const oldEnd = selected.end;
-			if (
-				oldStart instanceof Date &&
-				oldEnd instanceof Date &&
-				sameDay(oldStart, oldEnd) &&
-				value instanceof Date
-			) {
-				const newEnd = new Date(oldEnd);
-				newEnd.setFullYear(
-					value.getFullYear(),
-					value.getMonth(),
-					value.getDate()
-				);
-				update.end = newEnd;
-			}
-		}
 	}
 
 	function closeEditor() {
 		api?.exec("select-event", { id: null });
-	}
-
-	function handleSave({ values }: { values: Record<string, any> }) {
-		if (!api || !selected) return;
-		api.exec("update-event", { id: selected.id, event: values });
 	}
 
 	async function handleDelete() {
@@ -223,13 +182,10 @@
 		// runtime passes field keys as string[]; package types declare Record
 		changes: string[];
 	}) {
-		if (item.id === "close") {
-			closeEditor();
-		} else if (item.id === "save" && changes.length === 0) {
-			// editor empties changes after a successful save;
-			// bail otherwise and leave modal open
-			closeEditor();
-		}
+		// Cancel button (`id: "close"`) is closed by the calendar Editor
+		// wrapper itself. Save in autoSave-off mode finalises after the
+		// editor empties its changes set; treat that as success and close.
+		if (item.id === "save" && changes.length === 0) closeEditor();
 	}
 
 	$effect(() => {
@@ -238,42 +194,41 @@
 </script>
 
 <Calendar bind:this={api} events={data} {date} />
-{#if selected}
+{#if api}
 	<Editor
+		{api}
 		{items}
 		{bottomBar}
 		topBar={false}
 		autoSave={false}
 		placement="modal"
 		layout="columns"
-		values={selected}
 		onchange={handleChange}
-		onsave={handleSave}
 		onaction={handleAction}
-		css="wx-editor-custom" />
+		css="editor-custom" />
 {/if}
 
 <style>
 	/* adjust paddings, prevent inner components from stretching the Editor window */
-	:global(div.wx-panel.wx-editor-custom) {
+	:global(div.wx-panel.wx-editor-calendar.editor-custom) {
 		padding: 20px 20px 16px 20px;
 	}
-	:global(.wx-editor-custom .wx-sections > div:last-child .wx-field) {
+	:global(.wx-editor-calendar.editor-custom .wx-sections > div:last-child .wx-field) {
 		margin-bottom: 4px;
 	}
-	:global(.wx-editor-custom .wx-content .wx-right) {
+	:global(.wx-editor-calendar.editor-custom .wx-content .wx-right) {
 		margin-left: 0px;
 		min-height: auto;
 	}
-	:global(.wx-editor-custom .wx-comments-list) {
+	:global(.wx-editor-calendar.editor-custom .wx-comments-list) {
 		min-height: 250px;
 		max-height: 370px;
 	}
-	:global(.wx-editor-custom .wx-tasks-list) {
+	:global(.wx-editor-calendar.editor-custom .wx-tasks-list) {
 		max-height: 300px;
 	}
-	:global(.wx-editor-custom div.wx-editor-toolbar),
-	:global(.wx-editor-custom div.wx-editor-toolbar .wx-toolbar) {
+	:global(.wx-editor-calendar.editor-custom div.wx-editor-toolbar),
+	:global(.wx-editor-calendar.editor-custom div.wx-editor-toolbar .wx-toolbar) {
 		padding: 0;
 	}
 </style>

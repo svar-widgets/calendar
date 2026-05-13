@@ -1,12 +1,12 @@
 <div align="center">
 	
-# SVAR Svelte Event Calendar
+# SVAR Svelte Calendar
 
 </div>
 
 <div align="center">
 
-[Website](https://svar.dev/svelte/calendar/) • [Getting Started](https://docs.svar.dev/svelte/calendar/getting_started/) • [Demos](https://docs.svar.dev/svelte/calendar/samples/#/base/willow)
+[Homepage](https://svar.dev/svelte/calendar/) • [Getting Started](https://docs.svar.dev/svelte/calendar/getting-started/quick-start/) • [Demos](https://docs.svar.dev/svelte/calendar/samples/)
 
 </div>
 
@@ -18,31 +18,33 @@
 
 </div>
 
-**SVAR Svelte Event Calendar** is a customizable, interactive event calendar component written in Svelte and designed for scheduling and managing events. The component provides multiple views (day, week, month) with drag-and-drop event editing, a built-in event editor, and rich customization options. Comes with full TypeScript support, developer-friendly API, and flexible CSS styling.
+[SVAR Svelte Calendar](https://svar.dev/svelte/calendar/) is an interactive event calendar and scheduler component for Svelte and SvelteKit apps. It supports Day, Week, and Month views, drag-and-drop event editing, a ready-to-use event edit form, and rich customization options. 
+
+The calendar comes with full TypeScript support, extensible API, and flexible CSS styling. The PRO Edition offers additional views (Year, Agenda, Timeline, Resources) and recurring event support. 
 
 <div align="center">
-<img src="https://svar.dev/images/github/basic-calendar-svelte.gif" alt="SVAR Svelte Calendar UI">
+<img src="https://svar.dev/images/github/github-calendar.gif" alt="SVAR Svelte Calendar Preview">
 </div>
 
-### Key Features
+### ✨ Key Features
 
 - Multiple built-in views: Day, Week, Month
 - Drag-and-drop to move, resize, and create events
 - Customizable event editor form
 - Context menu and toolbar
 - Tooltips and custom event cards
-- Calendar groups for grouping events by category
+- Custom HTML in event markup
+- Multiple calendars with toggleable visibility
 - Event filtering
 - iCal import/export
-- REST data provider for backend integration
-- Custom HTML in event markup
 - Localization
-- Light and dark skins
+- Light and dark themes
 - Full TypeScript support
+- REST data provider for backend integration
 
 ### 🚀 PRO Edition
 
-SVAR Svelte Calendar is available in open-source and [PRO Editions](https://svar.dev/svelte/calendar/#pro). The PRO Edition offers additional views and automation features:
+SVAR Svelte Calendar is available in open-source and [PRO Editions](https://svar.dev/svelte/calendar/#pro). The PRO Edition offers four more scheduling views and automation features:
 
 - Year view
 - Agenda view
@@ -56,11 +58,11 @@ Or [see the live demo](https://svar.dev/demos/calendar/).
 
 ### 🛠️ How to Use
 
-To use the widget, simply import the package and include the component in your Svelte file:
+To use the calendar widget, simply import the package and include the component in your Svelte file:
 
 ```svelte
 <script>
-	import { Calendar } from "@svar/svelte-calendar";
+	import { Calendar } from "@svar-ui/svelte-calendar";
 
 	const events = [
 		{
@@ -77,7 +79,7 @@ To use the widget, simply import the package and include the component in your S
 <Calendar {events} {date} view="week" />
 ```
 
-For further instructions, follow the detailed [how-to-start guide](https://docs.svar.dev/svelte/calendar/getting-started/quick-start/).
+For further instructions, follow the detailed [quick start guide](https://docs.svar.dev/svelte/calendar/getting-started/quick-start/).
 
 ### How to Modify
 
@@ -98,7 +100,7 @@ vp test
 
 ### ⭐ Show Your Support
 
-If SVAR Svelte Calendar helps your project, give us a star! It helps us reach more developers and keeps us motivated to add new features.
+If SVAR Svelte Calendar helps your project, [give us a star](https://github.com/svar-widgets/calendar/)! It helps us reach more developers and keeps us motivated to add new features.
 
 ### :speech_balloon: Need Help?
 

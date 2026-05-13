@@ -1,6 +1,10 @@
 <script lang="ts">
-	import { Calendar, CalendarPanel } from "@svar-ui/svelte-calendar";
+	import { Calendar, CalendarPanel, Editor, getEditorItems, registerEditorItem } from "@svar-ui/svelte-calendar";
+	import type { CalendarInstanceApi, EventContext } from "@svar-ui/svelte-calendar";
+	import { RichSelect } from "@svar-ui/svelte-core";
 	import { relDate } from "../data.js";
+
+	registerEditorItem("richselect", RichSelect);
 
 	const date = relDate(0);
 
@@ -84,15 +88,43 @@
 		}
 	};
 
-	function cssByCalendar(obj: any) {
-		return `cal-${obj.event.calendarId}`;
+	function cssByCalendar(ctx: EventContext) {
+		return `cal-${ctx.event.calendarId}`;
 	}
+
+	let activeCalendarIds = $state<(string | number)[]>(
+		calendars.filter(c => c.active !== false).map(c => c.id)
+	);
+	const handleCalendarChange = (ev: { value: (string | number)[] }) => {
+		activeCalendarIds = ev.value;
+	};
+
+	const handleInit = (api: CalendarInstanceApi) => {
+		api.intercept("add-event", action => {
+			if (!action.event.calendarId) {
+				action.event.calendarId = activeCalendarIds[0] ?? calendars[0].id;
+			}
+		});
+	};
+
+	let api = $state<CalendarInstanceApi>();
+
+	const editorItems = [
+		...getEditorItems(),
+		{
+			comp: "richselect",
+			key: "calendarId",
+			label: "Calendar",
+			options: calendars.map(c => ({ id: c.id, label: c.label })),
+		},
+	];
 </script>
 
 <div class="layout">
-	<Calendar events={data} view="week" {date} {toolbar} onaction={handleAction} eventCss={cssByCalendar}>
-		<CalendarPanel open={panelVisible} {calendars} />
+	<Calendar bind:this={api} events={data} view="week" {date} {toolbar} onaction={handleAction} eventCss={cssByCalendar} init={handleInit}>
+		<CalendarPanel open={panelVisible} {calendars} onchange={handleCalendarChange} />
 	</Calendar>
+	{#if api}<Editor {api} items={editorItems} />{/if}
 </div>
 
 <style>
@@ -101,7 +133,7 @@
 	}
 
 	:global {
-		.cal-work.wx-calendar-name {
+		.cal-work.wx-calendar-name, .cal-work.wx-calendar-name label {
 			background-color: #9797f8;
 			color: white;
 		}
@@ -109,7 +141,7 @@
 			background-color: #9797f8;
 		}
 
-		.cal-home.wx-calendar-name {
+		.cal-home.wx-calendar-name, .cal-home.wx-calendar-name label {
 			background-color: #a0e4c3;
 			color: #444;
 		}
@@ -118,8 +150,9 @@
 			color: #444;
 		}
 
-		.cal-holiday.wx-calendar-name {
+		.cal-holiday.wx-calendar-name, .cal-holiday.wx-calendar-name label {
 			background-color: #f1e1b4;
+			color: #444;
 		}
 		.cal-holiday.wx-box-event, .cal-holiday.wx-bar-event {
 			background-color: #f1e1b4;
