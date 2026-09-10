@@ -1,15 +1,22 @@
 import type {
 	CalendarEvent,
 	Scale,
-	ScaleUnit,
 	ScaleConfig,
 	DateScaleConfig,
 	TimeScaleConfig,
 	UnitScaleConfig,
+	CombinedScaleConfig,
 	FormatFactory,
 } from "../../types";
+import { LinearScale } from "./linear_scale";
+import { DiscreteScale } from "./discrete_scale";
+import { CombinedScale } from "./combined_scale";
 
-const DAY_MS = 24 * 60 * 60 * 1000;
+export { LinearScale } from "./linear_scale";
+export { DiscreteScale } from "./discrete_scale";
+export { CombinedScale } from "./combined_scale";
+
+export const DAY_MS = 24 * 60 * 60 * 1000;
 
 function midnight(date: Date): Date {
 	const d = new Date(date);
@@ -17,184 +24,18 @@ function midnight(date: Date): Date {
 	return d;
 }
 
-export class LinearScale implements Scale {
-	rangeStart: Date;
-	rangeEnd: Date;
-	stepMs: number;
-	snapStepMs: number | false;
-	unitCount: number;
-	units: ScaleUnit[];
-	discrete: boolean;
-
-	constructor(
-		rangeStart: Date,
-		rangeEnd: Date,
-		unitCount: number,
-		stepMs: number,
-		format: (date: Date) => string,
-		ui?: Record<string, any>,
-		discrete?: boolean,
-		snapStepMs?: number | false
-	) {
-		this.rangeStart = rangeStart;
-		this.rangeEnd = rangeEnd;
-		this.unitCount = unitCount;
-		this.stepMs = stepMs;
-		this.snapStepMs = snapStepMs ?? stepMs;
-		this.discrete = discrete ?? false;
-
-		const size = 100 / unitCount;
-		this.units = [];
-		const stepDays = stepMs >= DAY_MS ? Math.round(stepMs / DAY_MS) : 0;
-		const markWeekend = stepMs === DAY_MS && unitCount > 1;
-		for (let i = 0; i < unitCount; i++) {
-			let unitStart: Date;
-			if (stepDays > 0) {
-				unitStart = new Date(rangeStart);
-				unitStart.setDate(unitStart.getDate() + i * stepDays);
-			} else {
-				unitStart = new Date(rangeStart.getTime() + i * stepMs);
-			}
-			const unit: ScaleUnit = {
-				id: this.formatId(unitStart),
-				label: format(unitStart),
-				position: i * size,
-				size,
-				ui: { ...ui, date: unitStart },
-			};
-			if (markWeekend) {
-				const dow = unitStart.getDay();
-				unit.weekend = dow === 0 || dow === 6;
-			}
-			this.units.push(unit);
-		}
-	}
-
-	private formatId(date: Date): string {
-		if (this.stepMs >= DAY_MS) {
-			return date.toISOString().slice(0, 10);
-		}
-		const h = String(date.getHours()).padStart(2, "0");
-		const m = String(date.getMinutes()).padStart(2, "0");
-		return `${h}:${m}`;
-	}
-
-	get count(): number {
-		return this.unitCount;
-	}
-
-	eventToPosition(event: CalendarEvent): { start: number; end: number } {
-		const range = this.rangeEnd.getTime() - this.rangeStart.getTime();
-		return {
-			start:
-				((event.start.getTime() - this.rangeStart.getTime()) / range) * 100,
-			end: ((event.end.getTime() - this.rangeStart.getTime()) / range) * 100,
-		};
-	}
-
-	contains(date: Date): boolean {
-		return date >= this.rangeStart && date < this.rangeEnd;
-	}
-
-	positionToValue(position: number): Date {
-		if (this.discrete) {
-			const unitSize = 100 / this.unitCount;
-			const raw = position / unitSize;
-			const idx = Math.max(
-				0,
-				Math.min(Math.floor(raw + 1e-9), this.unitCount - 1)
-			);
-			return new Date(this.rangeStart.getTime() + idx * this.stepMs);
-		}
-		const range = this.rangeEnd.getTime() - this.rangeStart.getTime();
-		return new Date(this.rangeStart.getTime() + (position / 100) * range);
-	}
-
-	getHeaders(): ScaleUnit[][] {
-		return [this.units];
-	}
-}
-
-export class DiscreteScale implements Scale {
-	items: { id: string | number; label: string }[];
-	accessor: {
-		get: (event: CalendarEvent) => string | number;
-		set: (
-			event: Partial<CalendarEvent>,
-			id: string | number
-		) => Partial<CalendarEvent>;
-	};
-	boxSize: number;
-	units: ScaleUnit[];
-
-	constructor(
-		items: { id: string | number; label: string }[],
-		accessor: {
-			get: (event: CalendarEvent) => string | number;
-			set: (
-				event: Partial<CalendarEvent>,
-				id: string | number
-			) => Partial<CalendarEvent>;
-		},
-		ui?: Record<string, any>
-	) {
-		this.items = items;
-		this.accessor = accessor;
-		this.boxSize = 100 / items.length;
-		this.units = items.map((item, i) => ({
-			id: item.id,
-			label: item.label,
-			position: i * this.boxSize,
-			size: this.boxSize,
-			ui,
-		}));
-	}
-
-	get count(): number {
-		return this.items.length;
-	}
-
-	eventToPosition(event: CalendarEvent): { start: number; end: number } {
-		const id = this.accessor.get(event);
-		const idx = this.items.findIndex(item => item.id === id);
-		if (idx === -1) {
-			return { start: -1, end: -1 };
-		}
-		return {
-			start: idx * this.boxSize,
-			end: (idx + 1) * this.boxSize,
-		};
-	}
-
-	contains(): boolean {
-		return true;
-	}
-
-	positionToValue(position: number): string | number {
-		const idx = Math.max(
-			0,
-			Math.min(Math.floor(position / this.boxSize), this.items.length - 1)
-		);
-		return this.items[idx].id;
-	}
-
-	getHeaders(): ScaleUnit[][] {
-		return [this.units];
-	}
-}
-
 function resolveAccessor(
 	accessor:
 		| string
 		| {
-				get: (event: CalendarEvent) => string | number;
+				get: (event: CalendarEvent) => string | number | (string | number)[];
 				set: (
 					event: Partial<CalendarEvent>,
 					id: string | number
 				) => Partial<CalendarEvent>;
 		  }
 ): {
-	get: (event: CalendarEvent) => string | number;
+	get: (event: CalendarEvent) => string | number | (string | number)[];
 	set: (
 		event: Partial<CalendarEvent>,
 		id: string | number
@@ -210,6 +51,22 @@ function resolveAccessor(
 		};
 	}
 	return accessor;
+}
+
+function countMultipleScales(config: ScaleConfig): number {
+	if (config.type === "unit") return config.multiple ? 1 : 0;
+	if (config.type === "combined") {
+		return (
+			countMultipleScales(config.outer) + countMultipleScales(config.inner)
+		);
+	}
+	if (config.type === "stacked") {
+		return config.levels.reduce(
+			(count, level) => count + countMultipleScales(level),
+			0
+		);
+	}
+	return 0;
 }
 
 export function createScale(
@@ -280,9 +137,29 @@ export function createScale(
 		}
 		case "unit": {
 			const c = config as UnitScaleConfig;
-			return new DiscreteScale(c.items, resolveAccessor(c.accessor), c.ui);
+			return new DiscreteScale(
+				c.items,
+				resolveAccessor(c.accessor),
+				c.ui,
+				c.multiple
+			);
 		}
-		case "combined":
+		case "combined": {
+			const c = config as CombinedScaleConfig;
+			if (countMultipleScales(c) > 1) {
+				throw new Error(
+					"CombinedScale supports at most one unit scale with multiple: true"
+				);
+			}
+			const outer = createScale(c.outer, startDate, fmt);
+			const inner = createScale(c.inner, startDate, fmt);
+			if (outer.count === 0 || inner.count === 0) {
+				throw new Error(
+					"CombinedScale requires non-empty outer and inner scales"
+				);
+			}
+			return new CombinedScale(outer, inner);
+		}
 		case "stacked":
 			throw new Error(`${config.type} scale not implemented`);
 		default:

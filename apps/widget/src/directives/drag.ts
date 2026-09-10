@@ -6,6 +6,7 @@ import type {
 	StoreActions,
 	ViewModel,
 } from "@svar-ui/calendar-store";
+import { decodeId } from "@svar-ui/calendar-store";
 import { startResize } from "./dragresize.js";
 import { getID } from "@svar-ui/lib-dom";
 
@@ -119,7 +120,7 @@ export function drag(node: HTMLElement, options: DragOptions) {
 			const id = getID(moveEl);
 			moveEl = null;
 			movePending = false;
-			if (!id) return;
+			if (id == null) return;
 			startResize(node, el, e, id, {
 				dx: opts.dx,
 				dy: opts.dy,
@@ -263,8 +264,9 @@ export function drag(node: HTMLElement, options: DragOptions) {
 			return;
 		}
 
-		const eventId = getID(moveEl);
-		const original = opts.getEvent(eventId);
+		const rawId = getID(moveEl);
+		const eventInfo = decodeId(rawId);
+		const original = opts.getEvent(eventInfo.id);
 
 		if (!original) {
 			resetMove();
@@ -312,10 +314,11 @@ export function drag(node: HTMLElement, options: DragOptions) {
 				const newEnd = new Date(newStart.getTime() + duration);
 
 				const payload: Record<string, any> = {
-					id: original.id,
+					id: eventInfo.id,
+					rawId,
 					event: { start: newStart, end: newEnd },
 				};
-				opts.exec("update-event", payload);
+				opts.exec("move-event", payload);
 			}
 
 			resetMove();
@@ -357,10 +360,11 @@ export function drag(node: HTMLElement, options: DragOptions) {
 			if (partial.start instanceof Date) {
 				partial.end = new Date(partial.start.getTime() + duration);
 				const payload: Record<string, any> = {
-					id: original.id,
+					id: eventInfo.id,
+					rawId,
 					event: partial,
 				};
-				opts.exec("update-event", payload);
+				opts.exec("move-event", payload);
 			}
 		}
 

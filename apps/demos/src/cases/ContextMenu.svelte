@@ -8,7 +8,7 @@
 		getMenuOptions,
 	} from "@svar-ui/svelte-calendar";
 
-	const helpers = getContext("wx-helpers");
+	const helpers = getContext<any>("wx-helpers");
 	
 	const { data, date } = getData();
 	let api = $state<any>();
@@ -18,7 +18,7 @@
 		{ id: "my-action", text: "My action", icon: "wxi-empty" },
 	];
 
-	function onclick({ action, context }: any) {
+	function onclick({ action }: any) {
 		if (action.id === "my-action"){
 		  helpers.showNotice({ text: "`My action` clicked", type: "success" });
 		}

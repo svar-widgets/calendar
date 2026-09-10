@@ -30,6 +30,7 @@
 	}: Props = $props();
 
 	let activeId: any = null;
+	let rawId: string | number | null = null;
 
 	// set locale
 	let l = getContext<ILocale | undefined>("wx-i18n");
@@ -54,10 +55,10 @@
 		return applyLocale(base);
 	}
 
-	function itemResolver(rawId: string|number, ev: MouseEvent) {
-		if (!rawId || !api) return null;
+	function itemResolver(id: string|number, ev: MouseEvent) {
+		if (!id || !api) return null;
 
-		const event = api.getEvent(rawId);
+		const event = api.getEvent(id);
 		if (!event) return null;
 
 		if (resolver) {
@@ -66,6 +67,7 @@
 		}
 
 		activeId = event.id;
+		rawId = id;
 		return event;
 	}
 
@@ -76,9 +78,9 @@
 		const id = typeof activeId === "object" ? activeId.id : activeId;
 
 		if (action.id === "edit-event") {
-			api.exec("select-event", { id });
+			api.exec("select-event", { id, rawId });
 		} else if (action.id === "delete-event") {
-			api.exec("delete-event", { id });
+			api.exec("delete-event", { id, rawId });
 		}
 
 		onclick?.(ev);

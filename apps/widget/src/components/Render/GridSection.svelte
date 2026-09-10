@@ -4,6 +4,7 @@
 		GridCell,
 		CellCss,
 		EventCss,
+		EventOverflowMode,
 	} from "@svar-ui/calendar-store";
 	import { setID } from "@svar-ui/lib-dom";
 
@@ -17,6 +18,7 @@
 		eventContent,
 		view,
 		section,
+		eventOverflow = "more",
 		onoverflow,
 	} = $props<{
 		primitives: Primitive[];
@@ -28,6 +30,7 @@
 		eventContent?: any;
 		view: string;
 		section: string;
+		eventOverflow?: EventOverflowMode;
 		onoverflow?: (overflow: boolean) => void;
 	}>();
 
@@ -77,7 +80,8 @@
 							(groupHeight - moreLabelHeight) / fullLaneHeight
 						)
 					);
-			const isExpanded = expandedRows.has(y);
+			const isExpanded =
+				eventOverflow === "expand" || expandedRows.has(y);
 
 			let extraHeight = 0;
 			if (isExpanded && info.totalLanes > maxVisible) {
@@ -376,6 +380,9 @@
 		color: var(--wx-color-font);
 		box-shadow: none;
 		border-radius: 0;
+	}
+	.wx-bar-single-day:global(.wx-dragging) {
+		background-color: var(--wx-background);
 	}
 	.wx-bar-single-day:hover {
 		background-color: var(--wx-color-secondary-hover);

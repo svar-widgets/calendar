@@ -222,3 +222,51 @@ test("toPositionEnd resolves to end date", () => {
 	expect(d.getHours()).toBe(12);
 	expect(d.getMinutes()).toBe(30);
 });
+
+test("projectEvent selects the matching section without layout", () => {
+	const vm = new WeekViewModel();
+	vm.setRange(new Date("2025-10-29"));
+	const original = makeEvent(1, "2025-10-27T09:00", "2025-10-27T10:00");
+	const processed = vm.process([
+		original,
+		makeEvent(2, "2025-10-27T09:30", "2025-10-27T10:30"),
+	]);
+
+	const short = vm.projectEvent({
+		start: new Date("2025-10-29T11:00"),
+		end: new Date("2025-10-29T12:00"),
+	});
+	expect(short).toHaveLength(1);
+	expect(short[0].section).toBe("timeGrid");
+	expect(short[0].mode).toBe("boxes");
+	expect(short[0].primitives).toHaveLength(1);
+	expect(short[0].primitives[0].slot).toBeUndefined();
+	expect(short[0].primitives[0].maxConcurrency).toBeUndefined();
+
+	const long = vm.projectEvent({
+		start: new Date("2025-10-28T00:00"),
+		end: new Date("2025-10-30T00:00"),
+	});
+	expect(long).toHaveLength(1);
+	expect(long[0].section).toBe("multiday");
+	expect(long[0].primitives[0].lane).toBeUndefined();
+	expect(long[0].primitives[0].totalLanes).toBeUndefined();
+
+	// Projecting a placeholder does not rewrite the already processed result.
+	expect(processed[1].primitives[0].slot).toBe(0);
+	expect(processed[1].primitives[0].maxConcurrency).toBe(2);
+});
+
+test("projectEvent ignores incomplete or invalid event ranges", () => {
+	const vm = new WeekViewModel();
+	vm.setRange(new Date("2025-10-29"));
+	vm.process([]);
+
+	expect(vm.projectEvent({ start: new Date("2025-10-29T09:00") })).toEqual([]);
+	expect(
+		vm.projectEvent({
+			start: new Date("2025-10-29T10:00"),
+			end: new Date("2025-10-29T09:00"),
+		})
+	).toEqual([]);
+});

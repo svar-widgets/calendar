@@ -2,7 +2,7 @@
 	import { getContext } from "svelte";
 	import { writable } from "svelte/store";
 	import { Calendar, Checkbox } from "@svar-ui/svelte-core";
-	import type { CalendarContextApi } from "./types.js";
+	import type { CalendarContextApi } from "../types.js";
 
 	type CalendarGroup = {
 		id: string | number;

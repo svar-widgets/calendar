@@ -1,5 +1,5 @@
 import { ViewModel } from "./models/model";
-import type { Store } from "@svar-ui/lib-state";
+import type { EventBus, Store } from "@svar-ui/lib-state";
 import type { EventsStore } from "./events_store";
 
 export type Brandmark = {
@@ -18,10 +18,32 @@ export type State = {
 	viewData: any;
 	filters: Map<string, (obj: any) => boolean>;
 
-	editorData: CalendarEvent | null;
-
+	editorData: EditorData | null;
+	history: HistoryState;
 	_view: ViewModel;
 };
+
+export type RecurringEditMode = "series" | "single" | "following";
+
+export interface EditorData {
+	id: EventID;
+	values: CalendarEvent;
+	rawId: EventID;
+	recurring: boolean;
+	recurringMode: RecurringEditMode;
+	recurringOriginalDate: string | null;
+}
+
+export type HistoryState = {
+	undo: number;
+	redo: number;
+};
+
+export type HistoryActionName =
+	| "add-event"
+	| "update-event"
+	| "move-event"
+	| "delete-event";
 
 export interface StoreActions {
 	["navigate-to"]: {
@@ -35,29 +57,54 @@ export interface StoreActions {
 		event: Partial<CalendarEvent>;
 		edit?: boolean;
 		id?: EventID;
+		rawId?: EventID;
 	};
 	["update-event"]: {
 		id: EventID;
+		rawId?: EventID;
 		event: Partial<CalendarEvent>;
 		mode?: "single" | "following";
-		originalDate?: string;
 	};
 	["delete-event"]: {
 		id: EventID;
+		rawId?: EventID;
+		// set on deletions the store issues itself while removing orphaned
+		// exceptions; skipped by history, backends with FK cascade may ignore
+		cascade?: boolean;
 	};
 	["select-event"]: {
 		id: EventID | null;
+		rawId?: EventID | null;
+		mode?: RecurringEditMode | null;
 	};
 	["move-event"]: {
 		id: EventID;
-		x: number;
-		y: number;
+		rawId?: EventID;
+		event: Partial<CalendarEvent>;
+		mode?: "single" | "following";
 	};
 	["filter-events"]: {
 		filter?: ((obj: any) => boolean) | null;
 		tag?: string;
 	};
+	["request-data"]: RequestDataAction;
+	["provide-data"]: ProvideDataAction;
 }
+
+
+export type RequestDataAction = {
+	startDate: Date;
+	endDate: Date;
+	date: Date;
+	view: string;
+};
+
+export type ProvideDataAction = {
+	data: {
+		events: CalendarEvent[];
+	};
+	reset?: boolean;
+};
 
 export type TDispatch = <A extends keyof StoreActions>(
 	action: A,
@@ -67,6 +114,8 @@ export type TDispatch = <A extends keyof StoreActions>(
 export type TActions = keyof StoreActions;
 
 export interface ICalendarStore extends Store<State> {
+	in: EventBus<StoreActions, keyof StoreActions>;
+	meta: Record<string, any>;
 	getView(name: string): ViewModel;
 	getEvents(start?: Date, end?: Date): CalendarEvent[];
 	getBrandmark(): Brandmark | null;
@@ -82,6 +131,11 @@ export interface CalendarEvent {
 	[key: string]: any;
 }
 
+export type EventProjection = {
+	htmlEvent: any;
+	event: Partial<CalendarEvent>;
+};
+
 export interface ScaleUnit {
 	id: string | number;
 	label: string;
@@ -91,13 +145,30 @@ export interface ScaleUnit {
 	ui?: Record<string, any>;
 }
 
+export type ScaleValue = Date | string | number | ScaleValue[];
+
+export interface ScaleSegment {
+	start: Date;
+	end: Date;
+	unitIndex: number;
+	sourceUnitId?: EventID;
+}
+
 export interface Scale {
 	units: ScaleUnit[];
 	eventToPosition(event: CalendarEvent): { start: number; end: number };
 	contains(date: Date): boolean;
 	readonly count: number;
 	getHeaders(): ScaleUnit[][];
-	positionToValue(position: number): Date | string | number;
+	positionToValue(position: number): ScaleValue;
+	segmentEvent(event: CalendarEvent): ScaleSegment[];
+	getUnitStart(unitIndex: number): Date | null;
+	applyPosition(
+		position: number,
+		target: "start" | "end",
+		event?: Partial<CalendarEvent>,
+		snap?: boolean
+	): Partial<CalendarEvent>;
 }
 
 export interface DateScaleConfig {
@@ -134,10 +205,11 @@ export type FormatFactory = (pattern: string) => (date: Date) => string;
 export interface UnitScaleConfig {
 	type: "unit";
 	items: { id: string | number; label: string }[];
+	multiple?: boolean;
 	accessor:
 		| string
 		| {
-				get: (event: CalendarEvent) => string | number;
+				get: (event: CalendarEvent) => string | number | (string | number)[];
 				set: (
 					event: Partial<CalendarEvent>,
 					id: string | number
@@ -181,6 +253,12 @@ export interface Primitive {
 	maxConcurrency?: number;
 }
 
+export interface ProjectedEvent {
+	section: string;
+	mode: SectionMode;
+	primitives: Primitive[];
+}
+
 export interface GridCell {
 	date: Date;
 	day: number;
@@ -195,6 +273,20 @@ export interface GridCell {
 
 export type SectionMode = "bars" | "boxes" | "grid" | "list" | "year";
 export type BoxLayoutMode = "split" | "overlap";
+export type EventOverflowMode = "more" | "expand";
+
+export interface SectionUI {
+	[key: string]: any;
+	drag?: boolean;
+	dragCreate?: boolean;
+	clipDrag?: boolean;
+	boxLayout?: BoxLayoutMode;
+	eventOverflow?: EventOverflowMode;
+	columns?: number;
+	weekStartDay?: number;
+	months?: any[];
+	nowLine?: boolean;
+}
 
 export interface Section {
 	name: string;
@@ -205,7 +297,7 @@ export interface Section {
 	boxLayout?: BoxLayoutMode;
 	filter?: (event: CalendarEvent) => boolean;
 	size?: number | "content" | "content-optional";
-	ui?: Record<string, any>;
+	ui?: SectionUI;
 }
 
 export interface SectionResult {
@@ -218,7 +310,7 @@ export interface SectionResult {
 	xVisible?: boolean;
 	yVisible?: boolean;
 	cells?: GridCell[];
-	ui?: Record<string, any>;
+	ui?: SectionUI;
 }
 
 export interface CellContext {

@@ -1,6 +1,6 @@
 {
 	"name": "@svar-ui/calendar-store",
-	"version": "2.6.0",
+	"version": "2.7.0",
 	"description": "State and models for SVAR Calendar",
 	"homepage": "https://svar.dev",
 	"license": "MIT",
@@ -22,7 +22,7 @@
 	},
 	"scripts": {
 		"build": "vp pack",
-		"watch": "vp pack --watch",
+		"dev": "vp pack --watch",
 		"test": "vp test",
 		"check": "vp check",
 		"prepublishOnly": "vp run build"

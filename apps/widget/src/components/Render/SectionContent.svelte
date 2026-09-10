@@ -53,6 +53,7 @@
 				{eventContent}
 				{view}
 				section={section.name}
+				eventOverflow={section.ui?.eventOverflow}
 				{onoverflow}
 			/>
 		{:else}

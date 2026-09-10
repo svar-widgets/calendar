@@ -26,8 +26,13 @@ test("event spanning years is multi-day", () => {
 	expect(isMultiDay(ev)).toBe(true);
 });
 
-test("event ending at midnight next day is multi-day", () => {
+test("event ending exactly at midnight next day is not multi-day", () => {
 	const ev = makeEvent("2025-10-28T22:00", "2025-10-29T00:00");
+	expect(isMultiDay(ev)).toBe(false);
+});
+
+test("event ending just past midnight next day is multi-day", () => {
+	const ev = makeEvent("2025-10-28T22:00", "2025-10-29T00:01");
 	expect(isMultiDay(ev)).toBe(true);
 });
 

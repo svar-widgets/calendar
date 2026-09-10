@@ -2,9 +2,12 @@ import pkg from "../package.json";
 
 export type {
 	CalendarEvent,
+	EditorData,
 	EventID,
 	ScaleUnit,
 	Scale,
+	ScaleValue,
+	ScaleSegment,
 	ScaleConfig,
 	DateScaleConfig,
 	TimeScaleConfig,
@@ -12,7 +15,10 @@ export type {
 	CombinedScaleConfig,
 	StackedScaleConfig,
 	SectionMode,
+	EventOverflowMode,
+	SectionUI,
 	Primitive,
+	ProjectedEvent,
 	GridCell,
 	Section,
 	SectionResult,
@@ -24,18 +30,25 @@ export type {
 	IEventStore,
 	FormatFactory,
 	State,
+	RecurringEditMode,
 	StoreActions,
+	RequestDataAction,
+	ProvideDataAction,
 	Brandmark,
+	EventProjection,
 } from "./types";
 
 export { EventsStore } from "./events_store";
 export {
 	LinearScale,
 	DiscreteScale,
+	CombinedScale,
 	createScale,
 } from "./models/helpers/scales";
 export { layoutBars, layoutBoxes } from "./models/helpers/layout";
 export { isMultiDay } from "./models/helpers/filters";
+export { encodeId, decodeId } from "./helpers/ids";
+export type { DecodedEventId, EventIdDetails } from "./helpers/ids";
 export { ViewModel } from "./models/model";
 export { WeekViewModel } from "./models/week_view";
 export { DayViewModel } from "./models/day_view";

@@ -85,6 +85,9 @@
 		box-shadow: none;
 		border-radius: 0;
 	}
+	.wx-bar-single-day:global(.wx-dragging) {
+		background-color: var(--wx-background);
+	}
 	.wx-bar-single-day:hover {
 		background-color: var(--wx-color-secondary-hover);
 		box-shadow: none;

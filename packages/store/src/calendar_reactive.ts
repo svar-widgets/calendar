@@ -1,5 +1,15 @@
 import type { TDataConfig } from "@svar-ui/lib-state";
-import type { ICalendarStore } from "./types";
+import type { ICalendarStore, State } from "./types";
+
+function sameRange(
+	left: { start: Date; end: Date },
+	right: { start: Date; end: Date }
+) {
+	return (
+		left.start.getTime() === right.start.getTime() &&
+		left.end.getTime() === right.end.getTime()
+	);
+}
 
 export function reactive(store: ICalendarStore): TDataConfig {
 	return [
@@ -7,16 +17,27 @@ export function reactive(store: ICalendarStore): TDataConfig {
 			in: ["currentDate", "currentView"],
 			out: ["rangeLabel", "visibleDateRange"],
 			exec: (ctx: TDataConfig) => {
-				const { currentView, currentDate } = store.getState();
+				const { currentView, currentDate, visibleDateRange } = store.getState();
 				const view = store.getView(currentView);
 				const [start, end] = view.setRange(currentDate);
-				store.setState(
-					{
-						rangeLabel: view.getRangeLabel(),
-						visibleDateRange: { start, end },
-					},
-					ctx
-				);
+				const nextRange = { start, end };
+				const rangeChanged = !sameRange(visibleDateRange, nextRange);
+
+				const update = {
+					rangeLabel: view.getRangeLabel(),
+				} as Partial<State>;
+				if (rangeChanged) update.visibleDateRange = nextRange;
+
+				store.setState(update, ctx);
+
+				if (rangeChanged) {
+					void store.in.exec("request-data", {
+						startDate: start,
+						endDate: end,
+						date: currentDate,
+						view: currentView,
+					});
+				}
 			},
 		},
 		{

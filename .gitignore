@@ -30,3 +30,6 @@ tl.db*
 
 # Local MCP server config
 .mcp.json
+
+# dev arterfacts
+/site

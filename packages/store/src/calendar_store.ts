@@ -1,7 +1,13 @@
 import { Store, EventBus, DataRouter } from "@svar-ui/lib-state";
 import type { TDataConfig, TWritableCreator } from "@svar-ui/lib-state";
 
-import type { FormatFactory, Brandmark, State, StoreActions } from "./types";
+import type {
+	FormatFactory,
+	Brandmark,
+	State,
+	StoreActions,
+	HistoryActionName,
+} from "./types";
 
 import { EventsStore } from "./events_store";
 import { ViewModel } from "./models/model";
@@ -17,6 +23,8 @@ import {
 } from "./registry";
 import { init } from "./actions/index";
 import { reactive } from "./calendar_reactive";
+import { decodeId } from "./helpers/ids";
+
 
 declare const __TRIAL__: boolean;
 declare const window: any;
@@ -29,6 +37,7 @@ registerCalendarView("month", MonthViewModel);
 
 export class CalendarStore extends Store<State> {
 	public in: EventBus<StoreActions, keyof StoreActions>;
+	public meta: Record<string, any> = {};
 	private _router: DataRouter<State, Partial<State>, StoreActions>;
 	private _views: { [key: string]: any } = {};
 	private _weekStartDay: number;
@@ -45,32 +54,36 @@ export class CalendarStore extends Store<State> {
 		const recurring = options?.recurring ?? false;
 		let EventsClass: typeof EventsStore = EventsStore;
 
-		// Initialize with default values
-		const defaultState: State = {
-			currentDate: new Date(),
-			currentView: "",
-			rangeLabel: "",
-			visibleDateRange: { start: new Date(), end: new Date() },
-			events: new EventsClass(),
-			viewData: {} as any,
-			filters: new Map(),
-			editorData: null,
-			_view: new WeekViewModel(),
-		};
-
 		super({ writable: w, async: false });
+		this.meta.recurring = recurring;
+		this._router = new DataRouter(super.setState.bind(this), reactive(this), {
+			events: (v: any[]) => {
+				const events = new EventsClass(v);
+				if (this._history) this._history.reset();
+				return events;
+			},
+		});
+
+		// Initialize with default values
 
 		this._weekStartDay = options?.weekStart ?? 1;
 		this._dateFormat =
 			options?.dateFormat ?? (() => (d: Date) => d.toLocaleDateString());
 
-		this.configureViews();
-
-		super.setState(defaultState);
-
-		this._router = new DataRouter(super.setState.bind(this), reactive(this), {
-			events: (v: any[]) => new EventsClass(v),
+		super.setState({
+			currentDate: new Date(),
+			currentView: "week",
+			rangeLabel: "",
+			visibleDateRange: { start: new Date(), end: new Date() },
+			events: new EventsClass([]),
+			viewData: {} as any,
+			filters: new Map(),
+			editorData: null,
+			_view: new WeekViewModel(),
 		});
+
+
+		this.configureViews();
 
 		// Setup event bus for handling all the actions
 		const inBus = (this.in = new EventBus());
@@ -113,6 +126,9 @@ export class CalendarStore extends Store<State> {
 		});
 	}
 
+	postInit() {
+	}
+
 	private applyViewConfig(instance: ViewModel) {
 		instance.weekStartDay = this._weekStartDay;
 		instance.fmt = this._dateFormat;
@@ -127,18 +143,9 @@ export class CalendarStore extends Store<State> {
 	}
 
 	getEvent(id: string | number) {
-		if (typeof id === "string") {
-			const isString = id.startsWith(":");
-			const start = isString ? 1 : 0;
-			let idx = id.indexOf("#", start);
-			if (idx === -1 && isString) idx = id.length;
-			if (idx !== -1) {
-				id = id.substring(start, idx);
-				if (!isString) id = parseInt(id);
-			}
-		}
-		return this.getState().events.getEvent(id);
+		return this.getState().events.getEvent(decodeId(id).id);
 	}
+
 
 	getBrandmark(): Brandmark | null {
 		if (__TRIAL__) {

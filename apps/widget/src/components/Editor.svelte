@@ -5,24 +5,38 @@
 	import { en } from "@svar-ui/calendar-locales";
 	import { en as coreEn } from "@svar-ui/core-locales";
 	import DateTimePicker from "./DateTimePicker.svelte";
-	import { getEditorItems } from "./editorItems.js";
+	import EventDatesForm from "./EventDatesForm.svelte";
+	import { getEditorItems } from "../defaults.js";
 
 	registerEditorItem("date-time-picker", DateTimePicker);
+	registerEditorItem("event-dates", EventDatesForm);
 
 	type BaseEditorProps = ComponentProps<typeof EditorBase>;
 	type EditorProps = Omit<BaseEditorProps, "values"> & {
 		api: any;
 		values?: never;
 	};
-	type EditorChangeEvent = Parameters<NonNullable<BaseEditorProps["onchange"]>>[0];
-	type EditorSaveEvent = Parameters<NonNullable<BaseEditorProps["onsave"]>>[0];
-	type EditorActionEvent = Parameters<NonNullable<BaseEditorProps["onaction"]>>[0];
+	type EditorChangeEvent = {
+		key: string;
+		value: any;
+		update: Record<string, any>;
+		input?: boolean;
+	};
+	type EditorSaveEvent = {
+		changes: (string | number)[];
+		values: Record<string, any>;
+	};
+	type EditorActionEvent = {
+		item: Record<string, any>;
+		values: Record<string, any>;
+		changes: (string | number)[];
+	};
 
 	let {
 		api,
 		values,
-		items = getEditorItems(),
-		placement = "sidebar",
+		items,
+		placement,
 		layout = "default",
 		focus = true,
 		css = "",
@@ -58,9 +72,18 @@
 		});
 	}
 
-	let generation = $state(1);
-	const allDay = $derived(generation > 0 ? $editorData?.allDay : false);
-	const cItems = $derived(applyLocale(items));
+	const calendarCtx = getContext<{
+		isCompact: () => boolean;
+	}>("calendar-api");
+	const finalPlacement = $derived(placement ?? (calendarCtx?.isCompact() ? "fullscreen" : "sidebar"));
+
+	const useRecurringForm = $derived(
+		!!$editorData?.recurring &&
+			($editorData?.recurringMode ?? "series") !== "single"
+	);
+	const cItems = $derived(
+		applyLocale(items ?? getEditorItems(useRecurringForm))
+	);
 
 	const defaultTopBar = {
 		items: [
@@ -77,11 +100,7 @@
 	};
 	const editorTopBar = $derived(topBar === undefined ? defaultTopBar : topBar);
 	const editorCss = $derived(
-		[
-			"wx-editor-calendar",
-			allDay ? "wx-editor-all-day" : "",
-			css,
-		]
+		["wx-editor-calendar", css]
 			.filter(Boolean)
 			.join(" ")
 	);
@@ -90,55 +109,33 @@
 		onsave?.(ev);
 		const data = $editorData;
 		if (!data) return;
-		api.exec("update-event", { id: data.id, event: { ...ev.values } });
-	}
-
-	function sameDay(a: Date, b: Date): boolean {
-		return (
-			a.getFullYear() === b.getFullYear() &&
-			a.getMonth() === b.getMonth() &&
-			a.getDate() === b.getDate()
-		);
+		const mode = data.recurringMode ?? "series";
+		// a series save must not carry the clicked occurrence's context in
+		// rawId, or the store would treat it as a single-occurrence edit
+		api.exec("update-event", {
+			id: data.id,
+			rawId: mode === "series" ? data.id : data.rawId,
+			event: { ...ev.values },
+			...(data.recurringOriginalDate && mode !== "series" ? { mode } : {}),
+		});
 	}
 
 	function handleChange(ev: EditorChangeEvent) {
-		const { key, value, update } = ev;
-		const prev = $editorData;
-		generation++;
-
-		if (prev && key === "start" && !update.allDay) {
-			const oldStart = prev.start;
-			const oldEnd = prev.end;
-			if (
-				oldStart instanceof Date &&
-				oldEnd instanceof Date &&
-				sameDay(oldStart, oldEnd) &&
-				value instanceof Date
-			) {
-				const newEnd = new Date(oldEnd);
-				newEnd.setFullYear(
-					value.getFullYear(),
-					value.getMonth(),
-					value.getDate()
-				);
-				update.end = newEnd;
-			}
-		}
 		onchange?.(ev);
 	}
 
 	function handleDelete() {
 		const data = $editorData;
 		if (!data) return;
-		api.exec("delete-event", { id: data.id });
-		api.exec("select-event", { id: null });
+		api.exec("delete-event", { id: data.id, rawId: data.rawId });
+		api.exec("select-event", { id: null, rawId: null });
 	}
 
 	function handleAction(ev: EditorActionEvent) {
 		onaction?.(ev);
 		const { item } = ev;
 		if (item.id === "close" && !!item.comp) {
-			api.exec("select-event", { id: null });
+			api.exec("select-event", { id: null, rawId: null });
 		}
 	}
 </script>
@@ -153,9 +150,9 @@
 		onchange={handleChange}
 		onaction={handleAction}
 		onsave={handleSave}
-		{placement}
+		placement={finalPlacement}
 		{layout}
-		values={$editorData}
+		values={$editorData.values}
 		css={editorCss}
 	/>
 {/if}
@@ -163,8 +160,5 @@
 <style>
 	:global(.wx-sidearea .wx-editor-calendar) {
 		width: 450px;
-	}
-	:global(.wx-editor-calendar.wx-editor-all-day .wx-timepicker) {
-		visibility: hidden;
 	}
 </style>

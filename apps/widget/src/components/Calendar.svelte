@@ -13,11 +13,20 @@
 	import { EventBusRouter } from "@svar-ui/lib-state";
 	import { CalendarStore } from "@svar-ui/calendar-store";
 	import type { ViewConfig } from "@svar-ui/calendar-store";
-	import type { CalendarContextApi, CalendarInstanceApi } from "./types.js";
-	import type { ToolbarItem, CellCss, EventCss } from "@svar-ui/calendar-store";
+	import type {
+		CalendarInstanceApi,
+		CalendarContextApi,
+	} from "../types.js";
+	import type {
+		ToolbarItem,
+		CellCss,
+		EventCss,
+		EventProjection,
+	} from "@svar-ui/calendar-store";
 
 	// ui
 	import Layout from "./Layout.svelte";
+
 
 	// incoming parameters
 	type Props = {
@@ -32,9 +41,13 @@
 		eventContent?: any;
 		date?: Date;
 		recurring?: boolean;
+		history?: boolean;
 		children?: Snippet;
 		tooltip?: any;
 		eventPopup?: any;
+		eventProjection?: EventProjection | null;
+		// on<action> handlers are forwarded to the event bus via restProps
+		[key: `on${string}`]: ((ev: any) => void) | undefined;
 	};
 
 	let {
@@ -48,10 +61,12 @@
 		eventCss,
 		eventContent,
 		recurring = false,
+		history = false,
 		readonly = false,
 		children,
 		tooltip,
 		eventPopup,
+		eventProjection,
 		...restProps
 	}: Props = $props();
 
@@ -75,6 +90,7 @@
 		recurring,
 		weekStart: rawLocale?.calendar?.weekStart ?? 1,
 		dateFormat: fmt,
+		history,
 	});
 
 	// define event route
@@ -135,12 +151,19 @@
 		exec,
 		getEvent,
 		fmt,
+		getBrandmark: () => dataStore.getBrandmark(),
 	} as CalendarContextApi;
 	setContext("calendar-api", stateStore);
 
+
 	let init_once = true;
+	let lastOptions: ViewConfig[] | null = null;
 	const reinitStore = () => {
-		dataStore.configureViews(viewOptions);
+		if (lastOptions !== viewOptions) {
+			lastOptions = viewOptions;
+			dataStore.configureViews(viewOptions);
+		}
+
 		dataStore.init({
 			currentView: view,
 			currentDate: date,
@@ -150,6 +173,7 @@
 		if (init_once && init) {
 			init(api);
 			init_once = false;
+			dataStore.postInit();
 		}
 	};
 
@@ -169,4 +193,6 @@
 	{tooltip}
 	{eventPopup}
 	{readonly}
+	{history}
+	{eventProjection}
 />

@@ -3,6 +3,7 @@ import type { CalendarEvent, StoreActions } from "@svar-ui/calendar-store";
 
 export interface EventPopupInfo {
 	eventId: string | number;
+	rawId: string | number;
 	element: HTMLElement;
 }
 
@@ -29,6 +30,9 @@ export function clickevent(node: HTMLElement, options: ClickEventOptions) {
 		target = e.target as HTMLElement;
 	}
 
+	function cancel() {
+		opts.onEventPopup?.(null);
+	}
 	function handleMouseUp(e: MouseEvent) {
 		if (!target) return;
 
@@ -40,21 +44,21 @@ export function clickevent(node: HTMLElement, options: ClickEventOptions) {
 		}
 
 		const node = locate(target);
-		const event = node ? opts.getEvent(getID(node)) : null;
 		target = null;
+		if (!node) return cancel();
+
+		const rawId = getID(node);
+		const event = opts.getEvent(rawId);
+		if (!event) return cancel();
 
 		if (opts.onEventPopup) {
-			if (!event) {
-				opts.onEventPopup(null);
-				return;
-			}
 			opts.onEventPopup({
 				eventId: event.id,
+				rawId,
 				element: node,
 			});
 		} else {
-			if (!event) return;
-			opts.exec("select-event", { id: event.id });
+			opts.exec("select-event", { id: event.id, rawId });
 		}
 	}
 

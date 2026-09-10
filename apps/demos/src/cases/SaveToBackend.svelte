@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Calendar, Editor } from "@svar-ui/svelte-calendar";
-	import { RestDataProvider } from "../../../../packages/provider/src/index.js";
+	import { RestDataProvider } from "@svar-ui/svelte-calendar";
 
 	const server = "https://calendar-backend.svar.dev";
 	const provider = new RestDataProvider(server);

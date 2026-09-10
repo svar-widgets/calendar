@@ -8,7 +8,19 @@ export default defineConfig(({ mode }) => {
 		__TRIAL__: JSON.stringify(env.VITE_SVAR_PACKAGE === "trial"),
 	});
 
+	let build;
+	if (mode === "export") {
+		build = {
+			lib: {
+				entry: "src/pro_export.ts",
+				formats: ["es"],
+				fileName: "calendar",
+			},
+		};
+	}
+
 	return {
+		build,
 		define: getVars(),
 		plugins: [
 			stripBlocks({ strip: env.VITE_SVAR_PACKAGE === "mit" }),

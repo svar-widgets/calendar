@@ -4,6 +4,7 @@
 	import { Layout } from "@svar-ui/svelte-layout";
 	import { Segmented } from "@svar-ui/svelte-core";
 	
+	
 	const { data, date } = getData();
 		
 	const defaultConfig = { items: getToolbarItems() };

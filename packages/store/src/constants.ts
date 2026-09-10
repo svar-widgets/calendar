@@ -13,14 +13,17 @@ export type ToolbarItem = {
 	[key: string]: any;
 };
 
-export function getToolbarItems(): ToolbarItem[] {
-	return [
+export function getToolbarItems(config?: { history?: boolean }): ToolbarItem[] {
+	const items: ToolbarItem[] = [
 		{ id: "nav", comp: "dateNav" },
 		{ id: "today", comp: "todayButton" },
 		{ comp: "spacer" },
 		{ id: "title", comp: "dateLabel" },
 		{ comp: "spacer" },
-		{ id: "modes", comp: "richselect" },
-		{ id: "add-event", comp: "addEventButton" },
+		{ id: "modes", comp: "richselect-navigation" },
+		{ id: "add-event", comp: "addEventButton", pinned: true },
 	];
+
+
+	return items;
 }

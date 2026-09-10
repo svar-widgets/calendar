@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext } from "svelte";
 	import type { ILocale } from "@svar-ui/lib-dom";
-	import type { CalendarContextApi } from "./types.js";
+	import type { CalendarContextApi } from "../types.js";
 	import { Button } from "@svar-ui/svelte-core";
 
 	const store = getContext<CalendarContextApi>("calendar-api");

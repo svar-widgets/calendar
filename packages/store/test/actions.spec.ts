@@ -2,6 +2,7 @@ import { test, expect } from "vite-plus/test";
 import { CalendarStore } from "../src/calendar_store";
 import { addEvent } from "../src/actions/add-event";
 import { updateEvent } from "../src/actions/update-event";
+import { moveEvent } from "../src/actions/move-event";
 import { navigateTo } from "../src/actions/navigate-to";
 import { navigateTime } from "../src/actions/navigate-time";
 import type { StoreActions } from "../src/types";
@@ -57,11 +58,13 @@ test("add-event mutates payload with normalized event data", () => {
 	addEvent(store, action);
 
 	expect(action.id).toBeDefined();
+	expect(action.rawId).toBe(action.id);
 	expect(action.event.id).toBe(action.id);
 	expect(action.event.text).toBe("Draft event");
 	expect(action.event.start).toBeInstanceOf(Date);
 	expect(action.event.end).toBeInstanceOf(Date);
 	expect(store.getState().editorData?.id).toBe(action.id);
+	expect(store.getState().editorData?.values.id).toBe(action.id);
 });
 
 test("add-event normalizes explicit allDay times", () => {
@@ -124,6 +127,137 @@ test("update-event normalizes allDay switch to full local day", () => {
 	expectLocalDateTime(action.event.end!, 2026, 3, 18);
 });
 
+test("move-event replaces only the source assignment", () => {
+	const store = new CalendarStore(writable);
+	store.configureViews(["resources"]);
+	store.init({
+		currentView: "resources",
+		currentDate: new Date(2026, 3, 17, 9),
+		events: [
+			{
+				id: 1,
+				start: new Date(2026, 3, 17, 9),
+				end: new Date(2026, 3, 17, 10),
+				assignee: ["alice", "bob"],
+			},
+		] as any,
+	});
+	const action: StoreActions["move-event"] = {
+		id: 1,
+		rawId: "1##:bob#",
+		event: {
+			start: new Date(2026, 3, 17, 11),
+			end: new Date(2026, 3, 17, 12),
+			assignee: "charlie",
+		},
+	};
+
+	moveEvent(store, action);
+
+	expect(store.getEvent(1)!.assignee).toEqual(["alice", "charlie"]);
+	expect(action.event.assignee).toEqual(["alice", "charlie"]);
+	expectLocalDateTime(store.getEvent(1)!.start, 2026, 3, 17, 11);
+});
+
+test("move-event deduplicates an existing destination assignment", () => {
+	const store = new CalendarStore(writable);
+	store.configureViews(["resources"]);
+	store.init({
+		currentView: "resources",
+		currentDate: new Date(2026, 3, 17, 9),
+		events: [
+			{
+				id: 1,
+				start: new Date(2026, 3, 17, 9),
+				end: new Date(2026, 3, 17, 10),
+				assignee: ["alice", "bob"],
+			},
+		] as any,
+	});
+
+	moveEvent(store, {
+		id: 1,
+		rawId: "1##:bob#",
+		event: { assignee: "alice" },
+	});
+
+	expect(store.getEvent(1)!.assignee).toEqual(["alice"]);
+});
+
+test("move-event keeps scalar and date updates unchanged", () => {
+	const store = new CalendarStore(writable);
+	store.configureViews(["resources"]);
+	store.init({
+		currentView: "resources",
+		currentDate: new Date(2026, 3, 17, 9),
+		events: [
+			{
+				id: 1,
+				start: new Date(2026, 3, 17, 9),
+				end: new Date(2026, 3, 17, 10),
+				assignee: "alice",
+			},
+		] as any,
+	});
+
+	moveEvent(store, {
+		id: 1,
+		event: {
+			start: new Date(2026, 3, 18, 9),
+			end: new Date(2026, 3, 18, 10),
+			assignee: "bob",
+		},
+	});
+
+	expect(store.getEvent(1)!.assignee).toBe("bob");
+	expectLocalDateTime(store.getEvent(1)!.start, 2026, 3, 18, 9);
+});
+
+test("move-event refreshes multi-unit view sections", async () => {
+	const store = new CalendarStore(writable);
+	store.configureViews([
+		{
+			id: "resources",
+			sections: {
+				timeGrid: {
+					xScale: {
+						items: [
+							{ id: "alice", label: "Alice" },
+							{ id: "bob", label: "Bob" },
+							{ id: "charlie", label: "Charlie" },
+						],
+						accessor: "assignee",
+						multiple: true,
+					},
+				},
+			},
+		},
+	]);
+	store.init({
+		currentView: "resources",
+		currentDate: new Date(2026, 3, 17, 9),
+		events: [
+			{
+				id: 1,
+				start: new Date(2026, 3, 17, 9),
+				end: new Date(2026, 3, 17, 10),
+				assignee: ["alice", "bob"],
+			},
+		] as any,
+	});
+
+	await store.in.exec("move-event", {
+		id: 1,
+		rawId: "1##:bob#",
+		event: { assignee: "charlie" },
+	});
+
+	const primitives = store.getState().viewData[0].primitives;
+	expect(store.getEvent(1)!.assignee).toEqual(["alice", "charlie"]);
+	expect(primitives).toHaveLength(2);
+	expect(primitives.map((primitive: any) => primitive.x)).toEqual([0, 200 / 3]);
+});
+
 test("navigate-to updates current date without changing view", () => {
 	const store = new CalendarStore(writable);
 	store.configureViews(["day", "week"]);
@@ -179,6 +313,124 @@ test("navigate-to updates both date and view", () => {
 	expect(state.currentDate.getTime()).toBe(
 		new Date("2026-04-20T09:00:00").getTime()
 	);
+});
+
+test("store emits request-data when visible range changes", () => {
+	const store = new CalendarStore(writable);
+	store.configureViews(["day"]);
+	const requests: StoreActions["request-data"][] = [];
+	store.in.on("request-data", payload => {
+		requests.push(payload as StoreActions["request-data"]);
+	});
+
+	store.init({
+		currentView: "day",
+		currentDate: new Date(2026, 3, 17, 9),
+		events: [] as any,
+	});
+
+	expect(requests).toHaveLength(1);
+	expectLocalDateTime(requests[0].startDate, 2026, 3, 17);
+	expectLocalDateTime(requests[0].endDate, 2026, 3, 18);
+	expect(requests[0].date.getTime()).toBe(new Date(2026, 3, 17, 9).getTime());
+	expect(requests[0].view).toBe("day");
+});
+
+test("store skips request-data when view switch keeps the same range", async () => {
+	const store = new CalendarStore(writable);
+	store.configureViews(["day", "resources"]);
+	const requests: StoreActions["request-data"][] = [];
+	store.in.on("request-data", payload => {
+		requests.push(payload as StoreActions["request-data"]);
+	});
+
+	store.init({
+		currentView: "day",
+		currentDate: new Date(2026, 3, 17, 9),
+		events: [] as any,
+	});
+
+	await store.in.exec("navigate-to", { view: "resources" });
+
+	expect(requests).toHaveLength(1);
+});
+
+test("provide-data merges incoming events by replacing matching ids", async () => {
+	const store = new CalendarStore(writable);
+	store.configureViews(["day"]);
+	store.init({
+		currentView: "day",
+		currentDate: new Date(2026, 3, 17, 9),
+		events: [
+			{
+				id: 1,
+				text: "old",
+				custom: "remove me",
+				start: new Date(2026, 3, 17, 10),
+				end: new Date(2026, 3, 17, 11),
+			},
+			{
+				id: 2,
+				text: "keep",
+				start: new Date(2026, 3, 17, 12),
+				end: new Date(2026, 3, 17, 13),
+			},
+		] as any,
+	});
+
+	await store.in.exec("provide-data", {
+		data: {
+			events: [
+				{
+					id: 1,
+					text: "new",
+					start: new Date(2026, 3, 17, 14),
+					end: new Date(2026, 3, 17, 15),
+				},
+			],
+		},
+	});
+
+	const out = store.getEvents();
+	expect(out).toHaveLength(2);
+	expect(store.getEvent(1)!.text).toBe("new");
+	expect(store.getEvent(1)!.custom).toBeUndefined();
+	expect(store.getEvent(2)!.text).toBe("keep");
+});
+
+test("provide-data reset replaces existing events", async () => {
+	const store = new CalendarStore(writable);
+	store.configureViews(["day"]);
+	store.init({
+		currentView: "day",
+		currentDate: new Date(2026, 3, 17, 9),
+		events: [
+			{
+				id: 1,
+				text: "old",
+				start: new Date(2026, 3, 17, 10),
+				end: new Date(2026, 3, 17, 11),
+			},
+		] as any,
+	});
+
+	await store.in.exec("provide-data", {
+		reset: true,
+		data: {
+			events: [
+				{
+					id: 2,
+					text: "new",
+					start: new Date(2026, 3, 17, 12),
+					end: new Date(2026, 3, 17, 13),
+				},
+			],
+		},
+	});
+
+	expect(store.getEvents()).toHaveLength(1);
+	expect(store.getEvent(1)).toBeUndefined();
+	expect(store.getEvent(2)!.text).toBe("new");
 });
 
 test("navigate-time now dispatches today, not the active view range start", () => {

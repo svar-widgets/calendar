@@ -3,7 +3,7 @@
 	import {setID} from "@svar-ui/lib-dom";
 	import type { ILocale } from "@svar-ui/lib-dom";
 	import type { CalendarEvent, Primitive } from "@svar-ui/calendar-store";
-	import type { CalendarContextApi } from "../types.js";
+	import type { CalendarContextApi } from "../../types.js";
 
 	const { primitives, eventContent } = $props<{
 		primitives: Primitive[];

@@ -1,19 +1,21 @@
 <script lang="ts">
-	import { getContext, onMount, tick } from "svelte";
+	import { getContext, onMount, tick, untrack } from "svelte";
 	import type { SectionResult, CellCss, EventCss } from "@svar-ui/calendar-store";
-	import type { CalendarContextApi } from "../types.js";
+	import type { CalendarContextApi } from "../../types.js";
 	import { drag } from "../../directives/drag.js";
 	import { clickevent } from "../../directives/clickevent.js";
 	import { clickdate } from "../../directives/clickdate.js";
 	import { Popup } from "@svar-ui/svelte-core";
 	import Headers from "./Headers.svelte";
 	import SectionContent from "./SectionContent.svelte";
-	import { useEventOverlay } from "./useEventOverlay.svelte.js";
+	import EventProjection from "./EventProjection.svelte";
+	import { resolveEventPosition } from "./resolveEventPosition.js";
+	import { useEventOverlay } from "../useEventOverlay.svelte.js";
 
 	const api = getContext<CalendarContextApi>("calendar-api");
 	const { _view } = api.getReactiveState();
 
-	const { data, cellCss, eventCss, eventContent, view, tooltip, eventPopup, readonly = false } = $props<{
+	const { data, cellCss, eventCss, eventContent, view, tooltip, eventPopup, readonly = false, eventProjection } = $props<{
 		data: SectionResult[];
 		cellCss?: CellCss;
 		eventCss?: EventCss;
@@ -22,6 +24,7 @@
 		tooltip?: any;
 		eventPopup?: any;
 		readonly?: boolean;
+		eventProjection?: any;
 	}>();
 
 	let ready = $state(false);
@@ -109,6 +112,9 @@
 			const lanes = p.totalLanes ?? 1;
 			if (lanes > maxLanes) maxLanes = lanes;
 		}
+		if (!maxLanes && projectionFor(section.name)) {
+			maxLanes = 1;
+		}
 		return maxLanes * BAR_LANE_HEIGHT;
 	}
 
@@ -126,10 +132,40 @@
 		return getMinContentHeight(section);
 	}
 
+	const projections = $derived.by(() => {
+		if (!eventProjection || !eventProjection.htmlEvent) return [];
+		let event;
+		for (let item of visibleSections) {
+			event = resolveEventPosition(
+				eventProjection.htmlEvent,
+				eventProjection.event,
+				item,
+				contentEls[item.name],
+				dx(item.name),
+				dy(item.name, item),
+				$_view,
+				document
+			);
+			if (event) break;
+		}
+		if (!event) return [];
+		// store calculated props on the original projection object
+		untrack(() => {
+			Object.assign(eventProjection.event, event);
+		});
+		return $_view.projectEvent(event);
+	});
+
+	function projectionFor(section: string) {
+		return projections.find(item => item.section === section);
+	}
+
 	const visibleSections = $derived(
 		data.filter(
 			(s: SectionResult) =>
-				s.size !== "content-optional" || s.primitives.length > 0
+				s.size !== "content-optional" ||
+				s.primitives.length > 0 ||
+				!!projectionFor(s.name)
 		)
 	);
 
@@ -158,9 +194,10 @@
 		return offsets;
 	});
 
-	let gridOverflow = $state(false);
-	function onGridOverflow(overflow: boolean) {
-		gridOverflow = overflow;
+	let gridOverflow = $state<Record<string, boolean>>({});
+	function onGridOverflow(section: string, overflow: boolean) {
+		if (!!gridOverflow[section] === overflow) return;
+		gridOverflow = { ...gridOverflow, [section]: overflow };
 	}
 
 	const hasYHeaders = $derived(
@@ -211,11 +248,13 @@
 		{@const secDx = dx(section.name)}
 		{@const secDy = dy(section.name, section)}
 		{@const minH = sectionMinHeight(section)}
+		{@const projection = projectionFor(section.name)}
 		<div
 			class="wx-section"
 			class:wx-section-last={idx === visibleSections.length - 1}
 			class:wx-section-sticky={sticky}
-			class:wx-section-grid={section.mode === "grid" && gridOverflow}
+			class:wx-section-grid={section.mode === "grid" &&
+				!!gridOverflow[section.name]}
 			class:wx-has-y-headers={hasYHeaders}
 			style:flex={sectionFlex(section, sticky)}
 			style:min-height={minH > 0 ? `${minH}px` : undefined}
@@ -272,8 +311,17 @@
 					{eventContent}
 					{view}
 					{tooltip}
-					onoverflow={section.mode === "grid" ? onGridOverflow : undefined}
+					onoverflow={section.mode === "grid"
+						? overflow => onGridOverflow(section.name, overflow)
+						: undefined}
 				/>
+				{#if projection}
+					<EventProjection
+						primitives={projection.primitives}
+						dx={secDx}
+						dy={secDy}
+					/>
+				{/if}
 			</div>
 		</div>
 	{/each}

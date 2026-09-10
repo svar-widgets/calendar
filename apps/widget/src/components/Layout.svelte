@@ -8,6 +8,8 @@
 
 	import type { ToolbarItem, Brandmark, CellCss, EventCss } from "@svar-ui/calendar-store";
 
+	const COMPACT_WIDTH = 480;
+
 	const _ = getContext<ILocale>("wx-i18n").getGroup("eventCalendar");
 
 	const {
@@ -22,6 +24,8 @@
 		eventPopup,
 		brandmark,
 		readonly = false,
+		history = false,
+		eventProjection,
 	}: {
 		store: any;
 		views: any;
@@ -34,25 +38,45 @@
 		eventPopup?: any;
 		brandmark?: Brandmark;
 		readonly?: boolean;
+		history?: boolean;
+		eventProjection?: any;
 	} = $props();
 
 	// svelte-ignore state_referenced_locally
 	const { viewData, currentView, _view } = store.getReactiveState();
 
 	const renderMode = $derived($_view?.render);
+
+	let isCompact = false;
+	// svelte-ignore state_referenced_locally
+	store.isCompact = () => isCompact;
+
+	function observeSize(node: HTMLElement) {
+		store.getRootNode = () => node;
+		const observer = new ResizeObserver(entries => {
+			isCompact = entries[0].contentRect.width < COMPACT_WIDTH;
+			node.classList.toggle("wx-calendar--compact", isCompact);
+		});
+
+		observer.observe(node);
+
+		return {
+			destroy: () => observer.disconnect(),
+		};
+	}
 </script>
 
 {#snippet viewContent()}
 	{#if renderMode === "scrollable"}
-		<ScrollableSection data={$viewData} {cellCss} {eventCss} {eventContent} view={$currentView} {tooltip} {eventPopup} {readonly} />
+		<ScrollableSection data={$viewData} {cellCss} {eventCss} {eventContent} view={$currentView} {tooltip} {eventPopup} {readonly} {eventProjection} />
 	{:else}
-		<Sections data={$viewData} {cellCss} {eventCss} {eventContent} view={$currentView} {tooltip} {eventPopup} {readonly} />
+		<Sections data={$viewData} {cellCss} {eventCss} {eventContent} view={$currentView} {tooltip} {eventPopup} {readonly} {eventProjection} />
 	{/if}
 {/snippet}
 
-<div class="wx-calendar" role="region" aria-label={_("Calendar")}>
+<div class="wx-calendar" role="region" aria-label={_("Calendar")} use:observeSize>
 	{#if toolbar !== null}
-		<Navigation {views} toolbar={toolbar} {readonly} />
+		<Navigation {views} toolbar={toolbar} {readonly} {history} />
 	{/if}
 	{#if children}
 		<div class="wx-calendar-content">

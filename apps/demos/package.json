@@ -1,6 +1,6 @@
 {
 	"name": "@svar-ui/svelte-calendar-demos",
-	"version": "2.6.0",
+	"version": "2.7.0",
 	"private": true,
 	"homepage": "https://svar.dev/svelte/calendar/",
 	"bugs": {
@@ -31,7 +31,7 @@
 		"build": "vp build",
 		"lint": "vp lint ./demos ./src",
 		"start": "vp dev --open",
-		"watch": "svelte-package -i ./src --watch"
+		"dev": "svelte-package -i ./src --watch"
 	},
 	"dependencies": {
 		"@svar-ui/calendar-locales": "workspace:*",
@@ -40,14 +40,18 @@
 		"@svar-ui/svelte-comments": "catalog:",
 		"@svar-ui/svelte-core": "catalog:",
 		"@svar-ui/svelte-editor": "catalog:",
+		"@svar-ui/svelte-excel-import": "catalog:",
+		"@svar-ui/svelte-export-popup": "catalog:",
 		"@svar-ui/svelte-filter": "catalog:",
 		"@svar-ui/svelte-layout": "catalog:",
 		"@svar-ui/svelte-tasklist": "catalog:",
 		"@svar-ui/svelte-toolbar": "catalog:",
-		"svelte-spa-router": "catalog:"
+		"svelte-spa-router": "catalog:",
+		"xlsx-writer-lite": "catalog:"
 	},
 	"devDependencies": {
 		"@sveltejs/vite-plugin-svelte": "catalog:",
-		"svelte": "catalog:"
+		"svelte": "catalog:",
+		"svelte-check": "catalog:"
 	}
 }

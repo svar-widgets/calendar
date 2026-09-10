@@ -4,8 +4,9 @@ import { stripBlocks } from "../../.vite-plugins/strip-blocks.js";
 
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), "");
+	const isTrial = env.VITE_SVAR_PACKAGE === "trial";
 	const getVars = () => ({
-		__TRIAL__: JSON.stringify(env.VITE_SVAR_PACKAGE === "trial"),
+		__TRIAL__: JSON.stringify(isTrial),
 	});
 
 	return {
@@ -16,6 +17,7 @@ export default defineConfig(({ mode }) => {
 			},
 			exports: true,
 			define: getVars(),
+			minify: isTrial,
 			plugins: [stripBlocks({ strip: env.VITE_SVAR_PACKAGE === "mit" })],
 		},
 		lint: {

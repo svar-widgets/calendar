@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { CalendarContextApi } from "./types.js";
+	import type { CalendarContextApi } from "../types.js";
 	import type { ILocale } from "@svar-ui/lib-dom";
 	import { getContext } from "svelte";
-	import { Toolbar, registerToolbarItem } from "@svar-ui/svelte-toolbar";
+	import { Toolbar, registerToolbarItem, ButtonList } from "@svar-ui/svelte-toolbar";
 	import { RichSelect, Segmented } from "@svar-ui/svelte-core";
 	import { getToolbarItems } from "@svar-ui/calendar-store";
 	import type { ToolbarItem } from "@svar-ui/calendar-store";
@@ -13,7 +13,12 @@
 	import AddEventButton from "./AddEventButton.svelte";
 
 	registerToolbarItem("richselect", RichSelect)
+	registerToolbarItem("richselect-navigation", RichSelect)
+	registerToolbarItem("richselect-navigation", ButtonList, { menu: true });
 	registerToolbarItem("segmented", Segmented);
+	registerToolbarItem("segmented-navigation", Segmented);
+	registerToolbarItem("segmented-navigation", ButtonList, { menu: true });
+	registerToolbarItem("segmented", ButtonList, { menu: true });
 	registerToolbarItem("dateNav", DateNav);
 	registerToolbarItem("todayButton", TodayButton);
 	registerToolbarItem("dateLabel", DateLabel);
@@ -22,32 +27,46 @@
 
 	const store = getContext<CalendarContextApi>("calendar-api");
 
-	const { views, toolbar = { items: getToolbarItems() }, readonly = false }: { views: any; toolbar?: { items?: ToolbarItem[] , css?: string }; readonly?: boolean } = $props();
-	const { currentView } = store.getReactiveState();
+	const {
+		views,
+		toolbar,
+		readonly = false,
+		history = false,
+	}: {
+		views: any;
+		toolbar?: { items?: ToolbarItem[]; css?: string };
+		readonly?: boolean;
+		history?: boolean;
+	} = $props();
+
+	const reactiveState = store.getReactiveState();
+	const { currentView } = reactiveState;
 
 	const _ = getContext<ILocale>("wx-i18n").getGroup("eventCalendar");
 
 	const items = $derived.by(() => {
-		const base = toolbar?.items;
+		const base = toolbar ? toolbar.items : getToolbarItems({ history });
 		const viewOptions: { id: string; label: string }[] = views.map((v: any) => ({
 			id: v.id,
 			label: _(v.label || v.id.charAt(0).toUpperCase() + v.id.slice(1)),
 		}));
 
 		const res = [...(base ?? [])].map((item: ToolbarItem) => {
-			if (item.id === "modes") {
+			let next = item;
+			if (next.id === "modes") {
 				if (viewOptions.length > 1) {
 					return {
-						...item,
+						...next,
 						value: $currentView,
 						options: viewOptions,
 					};
 				} else {
 					return null;
 				}
-			}
-			if (readonly && item.comp === "addEventButton") return null;
-			return item;
+			} else if (!readonly){
+			} else if (next.comp === "addEventButton" || next.id === "undo" || next.id === "redo") return null;
+
+			return next;
 		}).filter(Boolean);
 		return res as ToolbarItem[];
 	});
@@ -59,9 +78,11 @@
 	};
 </script>
 
-<div class="wx-navigation" role="navigation" aria-label={_("Calendar controls")}>
-	<Toolbar {items} {onchange} css={toolbar?.css}></Toolbar>
-</div>
+{#if items.length}
+	<div class="wx-navigation" role="navigation" aria-label={_("Calendar controls")}>
+		<Toolbar {items} {onchange} css={toolbar?.css}></Toolbar>
+	</div>
+{/if}
 
 <style>
 	.wx-navigation {

@@ -122,7 +122,7 @@
 
 <div
 	class="wx-year-grid"
-	style="grid-template-columns: repeat({columns}, 1fr)"
+	style="--wx-year-columns: {columns}"
 >
 	{#each months as month (month.month)}
 		<div class="wx-year-month">
@@ -200,9 +200,16 @@
 <style>
 	.wx-year-grid {
 		display: grid;
+		grid-template-columns: repeat(var(--wx-year-columns, 3), 1fr);
 		gap: 16px;
 		padding: 16px;
 		position: relative;
+	}
+	:global(.wx-calendar--compact) {
+		.wx-year-grid {
+			display: flex;
+			flex-direction: column;
+		}
 	}
 	.wx-month-label {
 		font-weight: var(--wx-font-weight-md);

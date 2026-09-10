@@ -1,6 +1,6 @@
 {
 	"name": "@svar-ui/svelte-calendar",
-	"version": "2.6.0",
+	"version": "2.7.0",
 	"description": "SVAR UI Event Calendar widget",
 	"homepage": "https://svar.dev/svelte/calendar/",
 	"bugs": {
@@ -29,9 +29,10 @@
 	"scripts": {
 		"check": "svelte-check --tsconfig ./tsconfig.json",
 		"build": "svelte-package -i ./src",
+		"build:export": "vp build --mode export",
 		"lint": "vp lint ./demos ./src",
 		"start": "vp dev --open",
-		"watch": "svelte-package -i ./src --watch"
+		"dev": "svelte-package -i ./src --watch"
 	},
 	"dependencies": {
 		"@svar-ui/calendar-ical": "workspace:*",
@@ -43,7 +44,6 @@
 		"@svar-ui/lib-state": "catalog:",
 		"@svar-ui/svelte-core": "catalog:",
 		"@svar-ui/svelte-editor": "catalog:",
-		"@svar-ui/svelte-layout": "catalog:",
 		"@svar-ui/svelte-menu": "catalog:",
 		"@svar-ui/svelte-toolbar": "catalog:",
 		"svelte-check": "catalog:"
@@ -51,10 +51,10 @@
 	"devDependencies": {
 		"@sveltejs/package": "catalog:",
 		"@sveltejs/vite-plugin-svelte": "catalog:",
-		"svelte": "catalog:"
+		"svelte": "catalog:",
+		"svelte-check": "catalog:"
 	},
 	"peerDependencies": {
 		"svelte": "catalog:"
-	},
-	"productTag": "calendar"
+	}
 }

@@ -1,19 +1,21 @@
 <script lang="ts">
-	import { getContext, onMount } from "svelte";
+	import { getContext, onMount, untrack } from "svelte";
 	import type { SectionResult, CellCss, EventCss } from "@svar-ui/calendar-store";
-	import type { CalendarContextApi } from "../types.js";
+	import type { CalendarContextApi } from "../../types.js";
 	import { drag } from "../../directives/drag.js";
 	import { clickevent } from "../../directives/clickevent.js";
 	import { clickdate } from "../../directives/clickdate.js";
 	import { Popup } from "@svar-ui/svelte-core";
 	import Headers from "./Headers.svelte";
 	import SectionContent from "./SectionContent.svelte";
-	import { useEventOverlay } from "./useEventOverlay.svelte.js";
+	import EventProjection from "./EventProjection.svelte";
+	import { resolveEventPosition } from "./resolveEventPosition.js";
+	import { useEventOverlay } from "../useEventOverlay.svelte.js";
 
 	const api = getContext<CalendarContextApi>("calendar-api");
 	const { _view } = api.getReactiveState();
 
-	const { data, cellCss, eventCss, eventContent, view, tooltip, eventPopup, readonly = false } = $props<{
+	const { data, cellCss, eventCss, eventContent, view, tooltip, eventPopup, readonly = false, eventProjection } = $props<{
 		data: SectionResult[];
 		cellCss?: CellCss;
 		eventCss?: EventCss;
@@ -22,6 +24,7 @@
 		tooltip?: any;
 		eventPopup?: any;
 		readonly?: boolean;
+		eventProjection?: any;
 	}>();
 
 	const section = $derived(data[0]);
@@ -77,6 +80,26 @@
 
 	const minW = $derived(getMinContentWidth());
 	const minH = $derived(getMinContentHeight());
+
+	const projection = $derived.by(() => {
+		if (!eventProjection || !eventProjection.htmlEvent) return null;
+		const event = resolveEventPosition(
+			eventProjection.htmlEvent,
+			eventProjection.event,
+			section,
+			contentEl,
+			dx,
+			dy,
+			$_view,
+			document
+		);
+		if (!event) return null;
+		// store calculated props on the original projection object
+		untrack(() => {
+			Object.assign(eventProjection.event, event);
+		});
+		return $_view.projectEvent(event).find(item => item.section === section.name);
+	});
 
 	const overlay = useEventOverlay(
 		id => api.getEvent(id),
@@ -151,6 +174,13 @@
 					{view}
 					{tooltip}
 				/>
+				{#if projection}
+					<EventProjection
+						primitives={projection.primitives}
+						{dx}
+						{dy}
+					/>
+				{/if}
 			{/if}
 		</div>
 	</div>

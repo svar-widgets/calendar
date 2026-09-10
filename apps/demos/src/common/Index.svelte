@@ -45,7 +45,7 @@
 		skin = ev.skin;
 		title = ev.title;
 		link = ev.link;
-		
+
 		if (isMobileView) show = false;
 	}
 
@@ -458,11 +458,6 @@
 			border-bottom: var(--wx-border);
 		}
 
-		:global(h3) {
-			font-size: 18px;
-			margin: 12px 0;
-			font-weight: normal;
-		}
 		:global(.demo-box) {
 			margin: 20px;
 		}

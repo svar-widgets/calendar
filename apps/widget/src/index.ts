@@ -1,3 +1,6 @@
+import pkg from "../package.json" with { type: "json" };
+const version = pkg.version;
+
 import Calendar from "./components/Calendar.svelte";
 import CalendarPanel from "./components/CalendarPanel.svelte";
 import ContextMenu from "./components/ContextMenu.svelte";
@@ -18,19 +21,31 @@ export {
 export type {
 	ToolbarItem,
 	CalendarEvent,
+	EditorData,
 	CellContext,
 	EventContext,
 	EventContentMode,
+	EventOverflowMode,
+	SectionUI,
 	CellCss,
 	EventCss,
 } from "@svar-ui/calendar-store";
 export type {
 	CalendarContextApi,
 	CalendarInstanceApi,
+	CalendarPoint,
 	ViewOption,
-} from "./components/types.js";
-export { getEditorItems } from "./components/editorItems.js";
+} from "./types.js";
+export { getEditorItems } from "./defaults.js";
 export { registerEditorItem } from "@svar-ui/svelte-editor";
 export { parseICal, serializeICal } from "@svar-ui/calendar-ical";
 export { RestDataProvider } from "@svar-ui/calendar-provider";
-export { Calendar, CalendarPanel, ContextMenu, Editor, Willow, WillowDark };
+export {
+	Calendar,
+	CalendarPanel,
+	ContextMenu,
+	Editor,
+	Willow,
+	WillowDark,
+	version,
+};

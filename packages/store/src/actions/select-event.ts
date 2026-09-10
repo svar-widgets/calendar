@@ -1,9 +1,10 @@
-import type { ICalendarStore } from "../types";
-import type { EventID } from "../types";
+import type { ICalendarStore, RecurringEditMode, StoreActions } from "../types";
+import { decodeId } from "../helpers/ids";
+import { getEditorEvent } from "../helpers/editor";
 
 export function selectEvent(
 	store: ICalendarStore,
-	params: { id: EventID | null }
+	params: StoreActions["select-event"]
 ) {
 	if (params.id == null) {
 		store.setState({ editorData: null });
@@ -11,8 +12,20 @@ export function selectEvent(
 	}
 
 	const { events } = store.getState();
+	const rawId = params.rawId ?? params.id;
 	const event = events.getEvent(params.id);
 	if (event) {
-		store.setState({ editorData: { ...event } });
+		const mode: RecurringEditMode =
+			params.mode ?? (event.masterEventId != null ? "single" : "series");
+		store.setState({
+			editorData: getEditorEvent(
+				events,
+				event,
+				mode,
+				decodeId(rawId).eventDate,
+				rawId,
+				!!store.meta.recurring
+			),
+		});
 	}
 }

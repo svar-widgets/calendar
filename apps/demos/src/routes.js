@@ -5,6 +5,7 @@ import ContextMenu from "./cases/ContextMenu.svelte";
 import Styling from "./cases/Styling.svelte";
 import DayView from "./cases/DayView.svelte";
 import WeekView from "./cases/WeekView.svelte";
+import CombinedScale from "./cases/CombinedScale.svelte";
 import MonthView from "./cases/MonthView.svelte";
 import Filter from "./cases/Filter.svelte";
 import CalendarPanel from "./cases/CalendarPanel.svelte";
@@ -14,6 +15,8 @@ import EditorComments from "./cases/Editor.svelte";
 import Tooltip from "./cases/Tooltip.svelte";
 import EventPopup from "./cases/EventPopup.svelte";
 import EventContent from "./cases/EventContent.svelte";
+import DragToCalendar from "./cases/DragToCalendar.svelte";
+import Responsive from "./cases/Responsive.svelte";
 
 
 export const links = [
@@ -27,6 +30,7 @@ export const links = [
 				CalendarPanel,
 				{ file: "CalendarPanel" },
 			],
+			["/responsive/:skin", "Mobile mode", Responsive, { file: "Responsive" }],
 		],
 	},
 	{
@@ -79,6 +83,12 @@ export const links = [
 				"Saving to Backend",
 				SaveToBackend,
 				{ file: "SaveToBackend" },
+			],
+			[
+				"/drag-to-calendar/:skin",
+				"Drag to Calendar",
+				DragToCalendar,
+				{ file: "DragToCalendar" },
 			],
 			[
 				"/ical/:skin",

@@ -1,6 +1,6 @@
 {
 	"name": "@svar-ui/calendar-ical",
-	"version": "2.6.0",
+	"version": "2.7.0",
 	"description": "iCal import/export for SVAR Calendar",
 	"license": "MIT",
 	"files": [
@@ -17,7 +17,7 @@
 	},
 	"scripts": {
 		"build": "vp pack",
-		"watch": "vp pack --watch",
+		"dev": "vp pack --watch",
 		"test": "vp test",
 		"check": "vp check",
 		"prepublishOnly": "vp run build"

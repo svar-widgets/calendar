@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getContext } from "svelte";
-	import type { CalendarContextApi } from "./types.js";
+	import type { CalendarContextApi } from "../types.js";
 
 	const store = getContext("calendar-api") as CalendarContextApi;
 	const { rangeLabel } = store.getReactiveState();

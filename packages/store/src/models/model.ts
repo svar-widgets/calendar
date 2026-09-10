@@ -1,22 +1,24 @@
 import type {
 	CalendarEvent,
 	Scale,
-	ScaleConfig,
 	Section,
 	SectionResult,
 	Primitive,
 	EventID,
 	GridCell,
 	FormatFactory,
+	ProjectedEvent,
 } from "../types";
 import { createScale } from "./helpers/scales";
 import { layoutBars, layoutBoxes } from "./helpers/layout";
+import { encodeId } from "../helpers/ids";
 
 export interface EventChunk {
 	id: EventID;
 	event: CalendarEvent;
 	start: Date;
 	end: Date;
+	unitIndex?: number;
 }
 
 interface CachedSection {
@@ -72,6 +74,82 @@ export abstract class ViewModel {
 		return results;
 	}
 
+	projectEvent(event: Partial<CalendarEvent>): ProjectedEvent[] {
+		if (
+			!(event.start instanceof Date) ||
+			!(event.end instanceof Date) ||
+			event.end <= event.start
+		) {
+			return [];
+		}
+
+		const full = {
+			...event,
+			id: event.id ?? "$event-placeholder",
+		} as CalendarEvent;
+		const projections: ProjectedEvent[] = [];
+
+		for (const cached of this.cachedSections) {
+			const { section, primaryScale, secondaryScales } = cached;
+			if (section.filter && !section.filter(full)) continue;
+
+			const primaryAxis = this.getPrimaryAxis(section);
+			const secondaryConfig =
+				primaryAxis === "x" ? section.yScale : section.xScale;
+			const primitives: Primitive[] = [];
+			const segments = primaryScale.segmentEvent(full);
+
+			for (let i = 0; i < segments.length; i++) {
+				const segment = segments[i];
+				const contextual =
+					segments.length > 1 || segment.sourceUnitId !== undefined;
+				const chunk: EventChunk = {
+					id: contextual
+						? encodeId(full.id, {
+								index: segments.length > 1 ? i : undefined,
+								unitId: segment.sourceUnitId,
+							})
+						: full.id,
+					event: full,
+					start: segment.start,
+					end: segment.end,
+					unitIndex: segment.unitIndex,
+				};
+
+				const unitIdx =
+					chunk.unitIndex ?? this.findUnitIndex(primaryScale, full);
+				const unit = primaryScale.units[unitIdx];
+				if (!unit) continue;
+
+				let secondaryScale = secondaryScales.get(unitIdx);
+				if (!secondaryScale) {
+					const groupStart =
+						primaryScale.getUnitStart(unitIdx) ?? this.startDate;
+					secondaryScale = createScale(secondaryConfig, groupStart, this.fmt);
+					secondaryScales.set(unitIdx, secondaryScale);
+				}
+
+				const primitive = this.mapToPrimitive(
+					chunk,
+					unit,
+					secondaryScale,
+					primaryAxis
+				);
+				if (primitive) primitives.push(primitive);
+			}
+
+			if (primitives.length) {
+				projections.push({
+					section: section.name,
+					mode: section.mode,
+					primitives,
+				});
+			}
+		}
+
+		return projections;
+	}
+
 	toPositionStart(
 		sectionName: string,
 		x: number,
@@ -110,107 +188,27 @@ export abstract class ViewModel {
 		const primaryPos = primaryAxis === "x" ? x : y;
 		const secondaryPos = primaryAxis === "x" ? y : x;
 
-		const result: Partial<CalendarEvent> = ev ? { ...ev } : {};
-
-		const primaryVal = cached.primaryScale.positionToValue(primaryPos);
 		const unitIdx = this.findUnitForPosition(cached.primaryScale, primaryPos);
-		const unit = cached.primaryScale.units[unitIdx];
 
 		let secScale = cached.secondaryScales.get(unitIdx);
 		if (!secScale) {
 			const secondaryConfig =
 				primaryAxis === "x" ? section.yScale : section.xScale;
-			const groupStartVal = cached.primaryScale.positionToValue(unit.position);
 			const groupStart =
-				groupStartVal instanceof Date ? groupStartVal : this.startDate;
-			secScale = createScale(secondaryConfig, groupStart);
+				cached.primaryScale.getUnitStart(unitIdx) ?? this.startDate;
+			secScale = createScale(secondaryConfig, groupStart, this.fmt);
 			cached.secondaryScales.set(unitIdx, secScale);
 		}
 
-		const secondaryVal = secScale.positionToValue(secondaryPos);
-
-		if (primaryVal instanceof Date && secondaryVal instanceof Date) {
-			const secStepMs = (secScale as any).stepMs || 60 * 60 * 1000;
-
-			if (secStepMs >= DAY_MS) {
-				// Both scales are date-based (e.g. month grid):
-				// primary only selects the group (week row),
-				// secondary provides the actual day
-				const combined = new Date(secondaryVal);
-				const src = ev?.[target];
-				if (src instanceof Date) {
-					combined.setHours(
-						src.getHours(),
-						src.getMinutes(),
-						src.getSeconds(),
-						src.getMilliseconds()
-					);
-				}
-				result[target] = combined;
-			} else {
-				// Secondary is time-based (e.g. week/day boxes):
-				// primary gives the day, secondary gives the time
-				const combined = new Date(primaryVal);
-				combined.setHours(
-					secondaryVal.getHours(),
-					secondaryVal.getMinutes(),
-					secondaryVal.getSeconds(),
-					secondaryVal.getMilliseconds()
-				);
-
-				const snapMs: number | false =
-					(secScale as any).snapStepMs ?? secStepMs;
-				if (snap && snapMs !== false) {
-					const ms = combined.getTime();
-					const base = (secScale as any).rangeStart?.getTime() || 0;
-					const snapped = base + Math.round((ms - base) / snapMs) * snapMs;
-					result[target] = new Date(snapped);
-				} else {
-					result[target] = combined;
-				}
-			}
-		} else if (primaryVal instanceof Date) {
-			if (snap) {
-				const rawStep: number | false =
-					(cached.primaryScale as any).snapStepMs ??
-					(cached.primaryScale as any).stepMs ??
-					DAY_MS;
-				const base = (cached.primaryScale as any).rangeStart?.getTime();
-				if (rawStep !== false && base != null) {
-					const snapped =
-						base +
-						Math.round((primaryVal.getTime() - base) / rawStep) * rawStep;
-					result[target] = new Date(snapped);
-				} else {
-					result[target] = primaryVal;
-				}
-			} else {
-				result[target] = primaryVal;
-			}
-			// Preserve time-of-day from the input event when the scale
-			// only resolves to day precision (e.g. month view)
-			const src = ev?.[target];
-			if (src instanceof Date) {
-				(result[target] as Date).setHours(
-					src.getHours(),
-					src.getMinutes(),
-					src.getSeconds(),
-					src.getMilliseconds()
-				);
-			}
-			if (typeof secondaryVal !== "object") {
-				const acc = (secScale as any).accessor;
-				if (acc?.set) {
-					Object.assign(result, acc.set(result, secondaryVal));
-				}
-			}
-		} else if (secondaryVal instanceof Date) {
-			result[target] = secondaryVal;
-			const acc = (cached.primaryScale as any).accessor;
-			if (acc?.set) {
-				Object.assign(result, acc.set(result, primaryVal));
-			}
-		}
+		let result: Partial<CalendarEvent> = ev ? { ...ev } : {};
+		Object.assign(
+			result,
+			cached.primaryScale.applyPosition(primaryPos, target, result, snap)
+		);
+		Object.assign(
+			result,
+			secScale.applyPosition(secondaryPos, target, result, snap)
+		);
 
 		return result;
 	}
@@ -230,11 +228,27 @@ export abstract class ViewModel {
 		// Filter
 		const filtered = section.filter ? events.filter(section.filter) : events;
 
-		// Split along primary scale boundaries
+		// Split and expand through the primary scale's operational units
 		const allChunks: EventChunk[] = [];
 		for (const event of filtered) {
-			const chunks = this.splitEvent(event, primaryScale, primaryConfig);
-			allChunks.push(...chunks);
+			const segments = primaryScale.segmentEvent(event);
+			for (let i = 0; i < segments.length; i++) {
+				const segment = segments[i];
+				const contextual =
+					segments.length > 1 || segment.sourceUnitId !== undefined;
+				allChunks.push({
+					id: contextual
+						? encodeId(event.id, {
+								index: segments.length > 1 ? i : undefined,
+								unitId: segment.sourceUnitId,
+							})
+						: event.id,
+					event,
+					start: segment.start,
+					end: segment.end,
+					unitIndex: segment.unitIndex,
+				});
+			}
 		}
 
 		// Place + Layout per primary-scale group
@@ -244,11 +258,13 @@ export abstract class ViewModel {
 		// Group chunks by primary scale unit
 		const unitGroups = new Map<number, EventChunk[]>();
 		for (const chunk of allChunks) {
-			const unitIdx = this.findUnitIndex(primaryScale, {
-				...chunk.event,
-				start: chunk.start,
-				end: chunk.end,
-			} as CalendarEvent);
+			const unitIdx =
+				chunk.unitIndex ??
+				this.findUnitIndex(primaryScale, {
+					...chunk.event,
+					start: chunk.start,
+					end: chunk.end,
+				} as CalendarEvent);
 			if (unitIdx === -1) continue;
 			let group = unitGroups.get(unitIdx);
 			if (!group) {
@@ -260,9 +276,7 @@ export abstract class ViewModel {
 
 		for (const [unitIdx, chunks] of unitGroups) {
 			const unit = primaryScale.units[unitIdx];
-			const groupStartVal = primaryScale.positionToValue(unit.position);
-			const groupStart =
-				groupStartVal instanceof Date ? groupStartVal : this.startDate;
+			const groupStart = primaryScale.getUnitStart(unitIdx) ?? this.startDate;
 			const secScale = createScale(secondaryConfig, groupStart, this.fmt);
 			secondaryScales.set(unitIdx, secScale);
 
@@ -288,12 +302,7 @@ export abstract class ViewModel {
 
 		// Ensure we have a secondary scale for headers even with no events
 		if (secondaryScales.size === 0) {
-			const fallbackStart =
-				primaryScale.units.length > 0
-					? primaryScale.positionToValue(primaryScale.units[0].position)
-					: this.startDate;
-			const groupStart =
-				fallbackStart instanceof Date ? fallbackStart : this.startDate;
+			const groupStart = primaryScale.getUnitStart(0) ?? this.startDate;
 			secondaryScales.set(
 				0,
 				createScale(secondaryConfig, groupStart, this.fmt)
@@ -372,62 +381,6 @@ export abstract class ViewModel {
 		return section.mode === "boxes" ? "x" : "y";
 	}
 
-	private splitEvent(
-		event: CalendarEvent,
-		primaryScale: Scale,
-		_config: ScaleConfig
-	): EventChunk[] {
-		const units = primaryScale.units;
-		if (units.length <= 1) {
-			return [
-				{
-					id: event.id,
-					event,
-					start: event.start,
-					end: event.end,
-				},
-			];
-		}
-
-		const chunks: EventChunk[] = [];
-		const boundaries: Date[] = [];
-		for (let i = 1; i < units.length; i++) {
-			const d = primaryScale.positionToValue(units[i].position);
-			if (d instanceof Date) boundaries.push(d);
-		}
-
-		let currentStart = event.start;
-
-		for (const boundary of boundaries) {
-			if (boundary <= currentStart) continue;
-			if (boundary >= event.end) break;
-
-			chunks.push({
-				id: event.id,
-				event,
-				start: currentStart,
-				end: boundary,
-			});
-			currentStart = boundary;
-		}
-
-		chunks.push({
-			id: event.id,
-			event,
-			start: currentStart,
-			end: event.end,
-		});
-
-		if (chunks.length > 1) {
-			for (let i = 0; i < chunks.length; i++) {
-				chunks[i].id =
-					(typeof event.id === "string" ? ":" : "") + `${event.id}#${i}`;
-			}
-		}
-
-		return chunks;
-	}
-
 	protected findUnitIndex(scale: Scale, event: CalendarEvent): number {
 		const units = scale.units;
 		if (units.length === 0) return -1;
@@ -494,8 +447,6 @@ export abstract class ViewModel {
 		}
 	}
 }
-
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 function deepMerge<T extends Record<string, any>>(
 	target: T,

@@ -7,10 +7,12 @@
 </script>
 
 {#key fullPath}
+<!-- svelte-ignore a11y_missing_attribute -->
 <a
 	use:link={fullPath}
 	use:active={fullPath}
 	class="demo"
+	class:wip={data[3] && data[3].wip}
 >
 	{data[1]}
 	{#if data[3] && data[3].pro}
@@ -51,5 +53,9 @@
 		font-size: 12px;
 		font-weight: 600;
 		margin-left: auto;
+	}
+	.wip, .wip:hover {
+		background-color: #ddd;
+		color: #aaa;
 	}
 </style>

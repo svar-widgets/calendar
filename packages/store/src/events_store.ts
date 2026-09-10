@@ -12,9 +12,19 @@ export class EventsStore implements IEventStore {
 		}
 	}
 
-	addEvent(event: Partial<CalendarEvent>): CalendarEvent {
-		const id = event.id ?? tempID();
-		const full = { ...event, id } as CalendarEvent;
+	addEvent(event: Partial<CalendarEvent>, overwrite?: boolean): CalendarEvent {
+		let full = event as CalendarEvent;
+		if (!event.id) {
+			full = { ...event, id: tempID() } as CalendarEvent;
+		}
+		if (overwrite) {
+			const idx = this.events.findIndex(e => e.id === full.id);
+			if (idx !== -1) {
+				this.events[idx] = full;
+				return full;
+			}
+		}
+
 		this.events.push(full);
 		return full;
 	}
@@ -56,6 +66,10 @@ export class EventsStore implements IEventStore {
 
 	clear(): void {
 		this.events = [];
+	}
+
+	restore(events: CalendarEvent[]): void {
+		this.events = [...events];
 	}
 
 	getCount(): number {

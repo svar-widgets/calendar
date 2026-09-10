@@ -18,9 +18,9 @@
 
 </div>
 
-[SVAR Svelte Calendar](https://svar.dev/svelte/calendar/) is an interactive event calendar and scheduler component for Svelte and SvelteKit apps. It supports Day, Week, and Month views, drag-and-drop event editing, a ready-to-use event edit form, and rich customization options. 
+[SVAR Svelte Calendar](https://svar.dev/svelte/calendar/) is an interactive event calendar and scheduler component for Svelte and SvelteKit apps. It supports Day, Week, and Month views, drag-and-drop event editing, a ready-to-use event edit form, and rich customization options.
 
-The calendar comes with full TypeScript support, extensible API, and flexible CSS styling. The PRO Edition offers additional views (Year, Agenda, Timeline, Resources) and recurring event support. 
+The calendar comes with full TypeScript support, extensible API, and flexible CSS styling. The PRO Edition offers additional views (Year, Agenda, Timeline, Resources) and recurring event support.
 
 <div align="center">
 <img src="https://svar.dev/images/github/github-calendar.gif" alt="SVAR Svelte Calendar Preview">

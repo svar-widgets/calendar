@@ -1,5 +1,6 @@
 import type { StoreActions, ICalendarStore, State } from "../types";
 import { normalizeAllDayEvent } from "../helpers/allDay";
+import { getEditorEvent } from "../helpers/editor";
 
 function hasTimeScale(store: ICalendarStore): boolean {
 	const { _view } = store.getState();
@@ -50,10 +51,18 @@ export function addEvent(
 	// Forward the normalized event to downstream consumers such as providers.
 	action.event = { ...full };
 	action.id = full.id;
+	action.rawId = full.id;
 
 	const updates: Partial<State> = { events };
 	if (action.edit) {
-		updates.editorData = { ...full };
+		updates.editorData = getEditorEvent(
+			events,
+			full,
+			"series",
+			null,
+			full.id,
+			!!store.meta.recurring
+		);
 	}
 	store.setState(updates);
 }

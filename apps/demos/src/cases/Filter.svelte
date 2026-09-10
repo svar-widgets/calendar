@@ -7,7 +7,7 @@
 	import { Willow, WillowDark, FilterQuery, FilterBar, FilterBuilder, createFilter, getQueryString } from "@svar-ui/svelte-filter";
 
 	const { data, date } = getData();
-	const helpers = getContext("wx-helpers");
+	const helpers = getContext<any>("wx-helpers");
 
 	let api: any;
 	let mode = $state("plain");
@@ -37,7 +37,7 @@
 	
 	const url =
 		"https://filter-backend.svar.dev/text-to-json";
-	async function text2filter(text, fields) {
+	async function text2filter(text: string, fields: unknown) {
 		const response = await fetch(url, {
 			method: "POST",
 			body: JSON.stringify({ text, fields }),
@@ -59,6 +59,12 @@
 		text,
 		startProgress,
 		endProgress,
+	}: {
+		value: any;
+		error?: any;
+		text: string;
+		startProgress: () => void;
+		endProgress: () => void;
 	}) {
 		if (text) {
 			error = null;
@@ -85,7 +91,7 @@
 		api.exec("filter-events", { filter: createFilter(value, {}, fields) });
 	}
 
-	function applyFilter({ value }){
+	function applyFilter({ value }: { value: any }){
 	  api.exec("filter-events", { filter: createFilter(value) });
 	}
 </script>
