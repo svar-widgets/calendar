@@ -88,4 +88,12 @@
 		color: var(--wx-color-font-alt);
 		padding-top: 2px;
 	}
+	:global(.wx-scrollable-section) {
+		.wx-y-header-cell {
+			border-top: 1px solid var(--wx-border-color);
+		}
+		.wx-y-header-cell:first-child {
+			border-top: none;
+		}
+	}
 </style>

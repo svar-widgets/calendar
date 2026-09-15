@@ -1,6 +1,6 @@
 {
 	"name": "@svar-ui/svelte-calendar-demos",
-	"version": "2.7.0",
+	"version": "2.7.1",
 	"private": true,
 	"homepage": "https://svar.dev/svelte/calendar/",
 	"bugs": {

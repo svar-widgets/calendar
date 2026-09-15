@@ -20,7 +20,7 @@
 
 [SVAR Svelte Calendar](https://svar.dev/svelte/calendar/) is an interactive event calendar and scheduler component for Svelte and SvelteKit apps. It supports Day, Week, and Month views, drag-and-drop event editing, a ready-to-use event edit form, and rich customization options.
 
-The calendar comes with full TypeScript support, extensible API, and flexible CSS styling. The PRO Edition offers additional views (Year, Agenda, Timeline, Resources) and recurring event support.
+The calendar comes with full TypeScript support, extensible API, and flexible CSS styling. The PRO Edition offers additional views (Year, Agenda, Timeline, Resources), recurring events, multi-resource scheduling, timezone support, and more.
 
 <div align="center">
 <img src="https://svar.dev/images/github/github-calendar.gif" alt="SVAR Svelte Calendar Preview">
@@ -30,17 +30,20 @@ The calendar comes with full TypeScript support, extensible API, and flexible CS
 
 - Multiple built-in views: Day, Week, Month
 - Drag-and-drop to move, resize, and create events
-- Customizable event editor form
+- Drag external items to the calendar as events
+- Event editor form with rich text and file attachments
 - Context menu and toolbar
 - Tooltips and custom event cards
 - Custom HTML in event markup
 - Multiple calendars with toggleable visibility
 - Event filtering
-- iCal import/export
 - Localization
+- Mobile mode
 - Light and dark themes
-- Full TypeScript support
 - REST data provider for backend integration
+- iCal import/export
+- Import from Excel
+- Full TypeScript support
 
 ### 🚀 PRO Edition
 
@@ -50,7 +53,13 @@ SVAR Svelte Calendar is available in open-source and [PRO Editions](https://svar
 - Agenda view
 - Timeline view (horizontal timeline with resource rows)
 - Resources view (single day with resource columns)
+- Combined scales for Resource view
+- Multi-resource events
 - Recurring events (RRULE-based)
+- Undo/redo support
+- Timezone support
+- Dynamic loading
+- Export to PDF, PNG, Excel
 
 Visit the [pricing page](https://svar.dev/svelte/calendar/pricing/) for full feature comparison, licensing details, and **free trial**.
 
@@ -62,7 +71,7 @@ To use the calendar widget, simply import the package and include the component 
 
 ```svelte
 <script>
-	import { Calendar } from "@svar-ui/svelte-calendar";
+	import { Calendar, Willow } from "@svar-ui/svelte-calendar";
 
 	const events = [
 		{
@@ -70,13 +79,16 @@ To use the calendar widget, simply import the package and include the component 
 			start: new Date(2026, 4, 5, 10, 0),
 			end: new Date(2026, 4, 5, 11, 30),
 			text: "Project kickoff",
-			details: "Outline the project's scope and resources.",
 		},
 	];
 	const date = new Date(2026, 4, 5);
 </script>
 
-<Calendar {events} {date} view="week" />
+<div style="height: 600px">
+	<Willow>
+		<Calendar {events} {date} view="week" />
+	</Willow>
+</div>
 ```
 
 For further instructions, follow the detailed [quick start guide](https://docs.svar.dev/svelte/calendar/getting-started/quick-start/).

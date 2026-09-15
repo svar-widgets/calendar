@@ -1,6 +1,6 @@
 {
 	"name": "@svar-ui/svelte-calendar",
-	"version": "2.7.0",
+	"version": "2.7.1",
 	"description": "SVAR UI Event Calendar widget",
 	"homepage": "https://svar.dev/svelte/calendar/",
 	"bugs": {

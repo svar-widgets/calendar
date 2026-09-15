@@ -34,7 +34,7 @@
 		title = matched?.[1] ?? "";
 		const props = matched?.[3] ?? { };
 		name = props.file ?? matched?.[1];
-		link = `${baseLink}${name.replace(/\s+/g, "")}.svelte`;
+		link = name.startsWith("pro_") ? `${baseLink}` : `${baseLink}${name.replace(/\s+/g, "")}.svelte`;
 
 		onnewpage?.({ page, skin, title, link });
 	}

@@ -14,7 +14,7 @@
 		{#each xHeaders[xHeaders.length - 1].slice(0, -1) as unit}
 			<div
 				class="wx-grid-line wx-vertical"
-				style="left: {dx * (unit.position + unit.size)}px"
+				style="left: {dx * (unit.position + unit.size) - 1}px"
 			></div>
 		{/each}
 	{/if}
